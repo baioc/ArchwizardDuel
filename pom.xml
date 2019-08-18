@@ -11,6 +11,13 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>br.ufsc.inf.leobr.cliente</groupId>
+            <artifactId>ngnrtFramework</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/ngnrtFramework.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>

@@ -1,17 +1,22 @@
 package br.ufsc.ine.archwizardduel;
 
-/**
- * Hello world!
- */
-public final class App {
-	private App() {
-	}
+import br.ufsc.inf.leobr.cliente.Jogada;
+import br.ufsc.inf.leobr.cliente.OuvidorProxy;
 
-	/**
-	 * Says hello to the world.
-	 * @param args The arguments of the program.
-	 */
+public final class App implements OuvidorProxy {
+	public void iniciarNovaPartida(Integer integer) {}
+
+	public void finalizarPartidaComErro(String s) {}
+
+	public void receberMensagem(String s) {}
+
+	public void receberJogada(Jogada jogada) {}
+
+	public void tratarConexaoPerdida() {}
+
+	public void tratarPartidaNaoIniciada(String s) {}
+
 	public static void main(String[] args) {
-		System.out.println("Hello World!");
+		System.out.print("Essa eh pro favarin!");
 	}
 }
