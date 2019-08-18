@@ -1,7 +1,7 @@
 package br.ufsc.ine.archwizardduel;
 
-import br.ufsc.inf.leobr.cliente.Jogada;
 import br.ufsc.inf.leobr.cliente.OuvidorProxy;
+import br.ufsc.inf.leobr.cliente.Jogada;
 
 public final class App implements OuvidorProxy {
 	public void iniciarNovaPartida(Integer integer) {}
@@ -17,6 +17,6 @@ public final class App implements OuvidorProxy {
 	public void tratarPartidaNaoIniciada(String s) {}
 
 	public static void main(String[] args) {
-		System.out.print("Essa eh pro favarin!");
+		System.out.println("Essa eh pro favarin!");
 	}
 }

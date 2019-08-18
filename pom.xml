@@ -15,7 +15,7 @@
             <artifactId>ngnrtFramework</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ngnrtFramework.jar</systemPath>
+            <systemPath>${project.basedir}/lib/netgames/ngnrtFramework.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
