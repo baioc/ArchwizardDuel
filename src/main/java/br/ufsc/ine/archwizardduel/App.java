@@ -17,6 +17,6 @@ public final class App implements OuvidorProxy {
 	public void tratarPartidaNaoIniciada(String s) {}
 
 	public static void main(String[] args) {
-		System.out.println("Essa eh pro favarin!");
+		System.out.println("Hello, Maven World!");
 	}
 }

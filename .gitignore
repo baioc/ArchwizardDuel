@@ -27,6 +27,6 @@ buildNumber.properties
 .vscode/
 
 #
-# NetGames
+# NetGames NRT
 #
 */netgames/*.properties
