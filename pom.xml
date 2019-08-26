@@ -55,7 +55,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
-
             <!--
                 You can run jacoco in the default profile with:
                 mvn jacoco:prepare-agent test jacoco:report
@@ -84,7 +83,6 @@
             </plugin>
         </plugins>
     </reporting>
-
     <profiles>
         <!--
         This profile enables jacoco when unit tests are run.
