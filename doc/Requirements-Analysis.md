@@ -10,14 +10,14 @@
 
 ## Introdução
 
-Em **Archwizard Duel**, cada jogador tem ao seu controle um mago com o qual deve provar seu valor ao vencer duelos contra seus inimigos.
+Em **Archwizard Duel**, cada jogador tem ao seu controle um mago com o qual deve provar seu valor ao vencer **duelos** contra seus oponentes.
 O combate acontece **em turnos**, cada um consistindo na simulação de um intervalo de tempo em uma arena.
 As ações dos magos são **programadas por código** escrito pelos jogadores em uma linguagem específica.
 
 ### Objetivos
 
 Desenvolver um **jogo *Player vs Player*** (PVP) utilizando a ferramenta de jogos distribuídos **NetGames**.
-Este será entregue como [projeto da disciplina **INE5417**](https://www.inf.ufsc.br/~ricardo.silva/INE5417e5608/) (Engenharia de Software I).
+Este será entregue como [trabalho da disciplina **INE5417**](https://www.inf.ufsc.br/~ricardo.silva/INE5417e5608/) (Engenharia de Software I).
 
 ### Referências
 
@@ -81,5 +81,5 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
   O programa utilizará bibliotecas como Swing, JavaFX e LibGDX para renderizar a interface gráfica do jogo de cada usuário, onde ele poderá identificar ambos os personagens e alguns de seus atributos.
 
 - **Controles programáticos:**
-  A linguagem interpretada pelo jogo tomará uma forma semelhante à linguagem [LISP](https://en.wikipedia.org/wiki/LISP).
-  A linguagem deverá prover primitivas para controlar o personagem (movimento, feitiços) e definir o fluxo de execução do programa (condicionais, procedimentos), assim como a capacidade de associar valores a nomes (variáveis, funções).
+  A linguagem interpretada pelo jogo tomará uma forma semelhante à de [LISP](https://en.wikipedia.org/wiki/LISP).
+  Esta deverá prover primitivas para controlar o personagem (movimento, feitiços) e definir o fluxo de execução do programa (condicionais, procedimentos), assim como a capacidade de associar valores a nomes (variáveis, funções).
