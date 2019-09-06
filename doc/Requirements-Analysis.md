@@ -47,11 +47,11 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
 
 ### Requisitos Funcionais
 
-- **Conectar:**
+- **Conectar à sessão:**
   O programa deverá estabelecer a conexão entre os dois jogadores através do servidor NetGames.
   Cada jogador deve se identificar com um nome para seu personagem.
 
-- **Iniciar:**
+- **Iniciar partida:**
   O programa deve conter um botão que inicia a partida, caso não haja alguma em andamento.
 
 - **Entrada de código:**
@@ -60,13 +60,10 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
 - **Efetuar jogada:**
   O programa deverá conter um botão que finaliza a jogada atual, enviando o código a um interpretador que efetua o controle do personagem.
 
-- **Alteração do estado da partida:**
-  Os atributos dos personagens visíveis ao jogador devem ser atualizados pelo interpretador em decorrência da jogada efetuada; em seguida deve ser feita a verificação de fim de jogo e então a preparação para a jogada do jogador seguinte.
-
-- **Desistir:**
+- **Desistir da partida:**
   O programa deve conter um botão para abandonar a partida em andamento.
 
-- **Desconectar:**
+- **Desconectar da sessão:**
   O programa poderá desligar a conexão entre os jogadores caso estes não desejem iniciar novas partidas.
 
 ### Requisitos Não Funcionais
@@ -77,9 +74,9 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
 - **Interpretador de código:**
   O programa deverá conter um interpetador de código que, dada uma sequência de instruções válidas na linguagem dos feitiços, execute jogadas que irão afetar seu oponente.
 
-- **Interface gráfica:**
-  O programa utilizará bibliotecas como Swing, JavaFX e LibGDX para renderizar a interface gráfica do jogo de cada usuário, onde ele poderá identificar ambos os personagens e alguns de seus atributos.
-
 - **Controles programáticos:**
   A linguagem interpretada pelo jogo tomará uma forma semelhante à de [LISP](https://en.wikipedia.org/wiki/LISP).
   Esta deverá prover primitivas para controlar o personagem (movimento, feitiços) e definir o fluxo de execução do programa (condicionais, procedimentos), assim como a capacidade de associar valores a nomes (variáveis, funções).
+
+- **Visualização do estado da partida:**
+  Os atributos dos personagens visíveis ao jogador devem ser atualizados pelo interpretador em decorrência da jogada efetuada; em seguida deve ser feita a verificação de fim de jogo e então a preparação para a jogada do jogador seguinte.

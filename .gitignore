@@ -30,3 +30,8 @@ buildNumber.properties
 # NetGames NRT
 #
 */netgames/*.properties
+
+#
+# Visual Paradigm
+#
+*.vpp.bak*
