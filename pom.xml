@@ -1,29 +1,62 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.ufsc.ine</groupId>
     <artifactId>archwizardduel</artifactId>
     <version>1.0</version>
+
     <properties>
+        <!-- Java 8 -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <!-- LibGDX's not in MVN Central -->
+        <repository>
+            <id>gdx-nightlies</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <!-- NetGames -->
         <dependency>
             <groupId>br.ufsc.inf.leobr.cliente</groupId>
             <artifactId>ngnrtFramework</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/netgames/ngnrtFramework.jar</systemPath>
+            <!-- @XXX: RUN mvn install:install-file -Dfile=lib/ngnrtFramework.jar -DgroupId=br.ufsc.inf.leobr.cliente -DartifactId=ngnrtFramework -Dversion=1.0 -Dpackaging=jar -DgeneratePom=true -->
         </dependency>
+
+        <!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- LibGDX Core -->
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <!-- LibGDX Desktop -->
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-backend-lwjgl</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-platform</artifactId>
+            <version>1.2.0</version>
+            <classifier>natives-desktop</classifier>
+        </dependency>
     </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -50,7 +83,46 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
         <plugins>
+            <!-- Build an executable fatjar -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>br.ufsc.ine.archwizardduel.App</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>br.ufsc.ine.archwizardduel.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -65,7 +137,19 @@
                 <version>0.8.1</version>
             </plugin>
         </plugins>
+
+        <!-- Include resources into package -->
+        <resources>
+            <resource>
+                <directory>res</directory>
+                <!-- <excludes>
+                    <exclude>jogoMultiPlayer.properties</exclude>
+                </excludes> -->
+                <!-- <targetPath>res/archwizardduel/</targetPath> -->
+            </resource>
+        </resources>
     </build>
+
     <reporting>
         <plugins>
             <plugin>
@@ -83,6 +167,7 @@
             </plugin>
         </plugins>
     </reporting>
+
     <profiles>
         <!--
         This profile enables jacoco when unit tests are run.
