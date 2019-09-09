@@ -1,4 +1,6 @@
-# Maven
+#
+# Standard Maven .gitignore
+#
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -9,18 +11,22 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
+#
+# IntelliJ
+#
+*.iml
+.idea/*
+!.idea/runConfigurations/
 
-# NetGamesNRT
-lib/*.properties
-
-
+#
 # Visual Studio Code
+#
 .settings/
 .classpath
 .project
 .vscode/
 
-# IntelliJ
-*.iml
-.idea/*
-!.idea/runConfigurations/
+#
+# NetGames NRT
+#
+*/netgames/*.properties
