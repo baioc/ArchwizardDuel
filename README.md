@@ -17,6 +17,12 @@ Referências de jogos com ideias semelhantes e seus estilos de controles program
 - [RobotWar](https://en.wikipedia.org/wiki/RobotWar) (1981) - BASIC
 - [Color Robot Battle](https://programminggames.org/Color_Robot_Battle) (1981) - Assembly
 
+Implementaremos uma pequena linguagem Lisp, isso facilitará parsing e interpretação.
+Referências na literatura:
+
+- [Bytecode Pattern - Nystrom, Game Programming Patterns](http://gameprogrammingpatterns.com/bytecode.html)
+- [Circular Evaluator - Abelson & Sussman, Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html)
+
 ## Desenvolvimento
 
 ### [Tarefas](https://github.com/baioc/ArchwizardDuel/projects)
@@ -30,30 +36,3 @@ Referências de jogos com ideias semelhantes e seus estilos de controles program
 
 - [Guia para *workflow* com Git](doc/git-style.md)
 - [Padrões de estilo de código Java](doc/coding-style.md)
-
-## [Infraestrutura](https://github.com/baioc/ArchwizardDuel/projects/1)
-
-### [NetGamesNRT](http://www.labsoft.ufsc.br/~netgames/NetGamesNRT)
-
-- Jogo em turnos: modelo servidor-cliente.
-- Multijogador:
-  - Sessões
-  - Partidas
-  - Jogadas
-
-## [Interface](https://github.com/baioc/ArchwizardDuel/projects/2)
-
-- [LibGDX](https://github.com/libgdx/libgdx/wiki)
-  - [Renderização descontínua](https://github.com/libgdx/libgdx/wiki/Continuous-%26amp%3B-Non-Continuous-Rendering)
-  - Mais potente, talvez menos portátil.
-- Swing
-  - Mais simples, não requer pacotes externos.
-
-## [Linguagem Interpretada](https://github.com/baioc/ArchwizardDuel/projects/3)
-
-Implementaremos uma pequena linguagem LISP, isso facilitará parsing e interpretação.
-
-Referências na literatura:
-
-- [Bytecode Pattern - Nystrom, Game Programming Patterns](http://gameprogrammingpatterns.com/bytecode.html)
-- [Circular Evaluator - Abelson & Sussman, Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html)
