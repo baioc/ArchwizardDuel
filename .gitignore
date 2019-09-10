@@ -9,10 +9,11 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
-
 # NetGamesNRT
 lib/*.properties
 
+# Visual Paradigm
+*.vpp.bak*
 
 # Visual Studio Code
 .settings/
