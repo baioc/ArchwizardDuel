@@ -6,7 +6,7 @@
 
 | Versão | Autores | Data | Ação |
 | :---: | :--- | :--- | :--- |
-| 0.1 | Alek Frohlich, Gabriel B. Sant'Anna e Mateus Favarin | 09/09/2019 | Eliciação inicial
+| 0.1 | Alek Frohlich, Gabriel B. Sant'Anna e Mateus Favarin | 10/09/2019 | Eliciação |
 
 ## Introdução
 
@@ -58,10 +58,13 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
   O programa deve conter um botão que inicia a partida (caso já não exista alguma em andamento).
 
 - **Entrada de código:**
-  O programa deve disponibilizar uma caixa de texto onde o jogador poderá digitar o código que servirá como esquema de controle do seu personagem.
+  O programa deve disponibilizar uma caixa de texto onde o jogador poderá digitar o código que servirá como esquema de controle do seu personagem em uma partida.
 
-- **Efetuar jogada:**
-  O programa deverá conter um botão que finaliza a jogada atual, enviando o código a um interpretador que realiza o controle do personagem.
+- **Enviar jogada:**
+  O programa deverá conter um botão que finaliza a jogada atual, enviando o código a um interpretador que realiza o controle do personagem na partida em andamento.
+
+- **Receber jogada:**
+  O programa deverá mostrar as jogadas realizadas pelo jogador remoto, atualizando o cliente do usuário local.
 
 - **Desistir da partida:**
   O programa deve conter um botão para abandonar uma partida em andamento.
