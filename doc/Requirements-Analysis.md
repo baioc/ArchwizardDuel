@@ -22,12 +22,16 @@ Este será entregue como [trabalho da disciplina **INE5417**](https://www.inf.uf
 
 ### Descrição do Jogo
 
-- O jogo é composto por dois magos, os quais se alternam em turnos para lançar feitiços. Os magos possuem atributos de vida e mana e só podem lançar
-feitiços enquanto possuírem mana. O jogo acaba quando um dos magos morre durante ou após a avaliação dos feitiços de seu adversário.
-- Os feitiços nada mais são que primitivas de uma linguagem de programação, i.g: fireball e move.
-- Estas primitivas, juntamente com [estruturas de controle](https://en.wikiversity.org/wiki/Control_structures) e [funções de primeira classe](https://en.wikipedia.org/wiki/First-class_function) (if-else, for, def ...) comporão uma linguagem de programação.
-- A cada turno, um mago deve escrever um programa na linguagem acima, o qual será interpretado por ambos os magos, após a confirmação da jogada, fazendo uso de um interpretador da linguagem.
-- A utilização de recursos da linguagem custa mana ao mago que os usa, de forma que o interpretador cessará suas atividades caso a mana do mago atuante terminar.
+- Uma partida consiste em uma arena com dois magos - cada um controlado por um jogador - os quais se alternam em turnos para lançar feitiços e se movimentar até que algum jogador vença.
+- Cada ação de um mago gasta parte de um recurso seu chamado mana.
+- Um turno consiste em uma sequência de ações efetuadas até que acabe a mana do mago controlado pelo jogador atuante (da vez), momento em que passa a ser o turno do outro jogador, e assim por diante.
+- Cada mago possui também um atributo de vida, que é reduzida quando ele é atingido por um feitço inimigo.
+- Uma partida termina quando a vida de um dos magos acaba, caracterizando vitória do jogador que controla o outro mago (que ainda tem vida).
+- As ações realizadas pelos magos são controlados pelos seus respectivos jogadores através de jogadas.
+- Uma jogada consiste em um código (texto) em uma linguagem de programação específica do jogo que define as ações a serem realizadas naquele turno (até que acabe a mana).
+- Ações são, portanto, operações primitivas dessa linguagem que alteram o estado do jogo; `fireball` (para lançar um feitiço) e `move` (para movimentar o mago) são possíveis exemplos de tais operações.
+- Essas primitivas, juntamente com [estruturas de controle](https://en.wikiversity.org/wiki/Control_structures) e [funções de primeira classe](https://en.wikipedia.org/wiki/First-class_function) (`if-then-else`, `for`, `define`, etc) compõe a linguagem de programação que serve de controle aos jogadores.
+- A cada turno, o jogador deve escrever uma sequência de expressões válidas na linguagem, a qual será interpretada pelo programa - da mesma forma para ambos os jogadores - de maneira a trazer ao estado do jogo as alterações descritas nessa jogada.
 
 ### Referências
 
@@ -53,6 +57,15 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
 - Deverá ser entregue a modelagem do software em UML 2 produzida com a ferramenta [Visual Paradigm](https://www.visual-paradigm.com/) (*Community Edition*)
 - O programa deve apresentar uma interface gráfica bidimensional.
 
+### Interface Gráfica
+
+Segue abaixo um rascunho da interface gráfica que poderia ser apresentada pelo cliente do jogo.
+
+![GUI](interface.png "Rascunho da interface gráfica")
+
+Destaca-se, entretanto, que são mostrados apenas elementos (botões) referentes ao estado de uma partida em andamento.
+Estes seriam substituídos por opções como "Conectar" e "Criar Sessão" ou "Iniciar Partida" e "Desconectar" dependendo do momento atual da interação do usuário com o programa (se está ou não conectado a uma sessão juntamente com outro usuário remoto, por exemplo).
+
 ## Requisitos de Software
 
 ### Requisitos Funcionais
@@ -66,6 +79,9 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
 
 - **Iniciar partida:**
   O programa deve conter um botão que inicia a partida (caso já não exista alguma em andamento).
+
+- **Receber determinação de início de partida:**
+  O programa deve avisar ao usuário que a partida foi iniciada.
 
 - **Entrada de código:**
   O programa deve disponibilizar uma caixa de texto onde o jogador poderá digitar o código que servirá como esquema de controle do seu personagem em uma partida.
@@ -84,18 +100,16 @@ Programa **orientado a objetos**, **distribuído** e **multiusuário** (dois jog
 
 ### Requisitos Não Funcionais
 
-- **Características da linguagem**
-  A linguagem do jogo deverá tomará uma forma semelhante à de [LISP](https://en.wikipedia.org/wiki/LISP). Devendo prover primitivas para controlar o personagem (movimento, feitiços) e definir o fluxo de execução de suas ações (condicionais, procedimentos).
-
-- **Especificações de projeto**
+- **Especificações de projeto:**
   O programa deverá ser escrito em Java, deverá ser compilado de forma a ser compatível com a JRE de versão 8 e deve seguir uma modelagem UML2
   conformante com a metodologia vista em aula.
 
-- **Framework distribuído**
+- **Framework distribuído:**
   O programa deve utilizar o framework NetGamesNRT para realizar a comunicação cliente-servidor.
 
-- **Interface gráfica**
-  O programa deve possuir uma interface gráfica que represente o estado compartilhado do jogo. Esta interface deverá ser implementada
-  em Java Swing por questões de compatibilidade.
+- **Interface gráfica:**
+  O programa deve possuir uma interface gráfica que represente o estado compartilhado do jogo.
+  Esta interface será implementada em Java Swing por questões de compatibilidade.
 
-### Protótipo de Interface Gráfica
+- **Características da linguagem:**
+  A linguagem do jogo deverá tomará uma forma semelhante à de [Lisp](https://en.wikipedia.org/wiki/LISP). Devendo prover primitivas para controlar o personagem (movimento, feitiços) e definir o fluxo de execução de suas ações (desvios condicionais, procedimentos).
