@@ -38,7 +38,7 @@ public class Client extends JFrame {
 		label1.setToolTipText("L1 Tooltip");
 		this.add(label1);
 
-		Icon bug = new ImageIcon("bug.png");
+		Icon bug = new ImageIcon(getClass().getClassLoader().getResource("bug.png"));
 		label2 = new JLabel("JLabel with Icon", bug, SwingConstants.LEFT);
 		label2.setToolTipText("Another JLabel tooltip");
 		this.add(label2);
