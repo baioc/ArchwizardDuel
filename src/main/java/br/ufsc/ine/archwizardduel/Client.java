@@ -1,130 +1,111 @@
 package br.ufsc.ine.archwizardduel;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.JOptionPane;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
 
 public class Client extends JFrame {
 
-	private JLabel label1, label2, label3;
-	private JTextField textField1, textField2, textField3;
-	private JPasswordField pass;
-	private JButton button;
-	private JCheckBox bold, italic;
-
+	private static final int WIDTH = 800;
+	private static final int HEIGHT = 600;
 
 	public Client() {
-		super("Testing JLabel");
-		setLayout(new FlowLayout());
+		super("Archwizard Duel");
 
-		Font font = new Font("Arial", Font.PLAIN, 14);
+		this.setSize(WIDTH, HEIGHT);
 
-		label1 = new JLabel("JLabel text");
-		label1.setFont(font);
-		label1.setToolTipText("L1 Tooltip");
-		this.add(label1);
+		int width = 200;
+		int height = 30;
 
-		Icon bug = new ImageIcon(getClass().getClassLoader().getResource("bug.png"));
-		label2 = new JLabel("JLabel with Icon", bug, SwingConstants.LEFT);
-		label2.setToolTipText("Another JLabel tooltip");
-		this.add(label2);
+		JButton connectButton = new JButton("Conectar a Sessao");
+		connectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
 
-		label3 = new JLabel("JLabel with added stuff");
-		label3.setIcon(bug);
-		label3.setHorizontalTextPosition(SwingConstants.CENTER);
-		label3.setVerticalTextPosition(SwingConstants.BOTTOM);
-		label3.setToolTipText("Yet another tip");
-		this.add(label3);
+		JButton disconnectButton = new JButton("Desconectar da Sessao");
+		disconnectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
+		disconnectButton.setVisible(false);
 
-		textField1 = new JTextField(10);
-		this.add(textField1);
+		JButton startGame = new JButton("Iniciar Partida");
+		startGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
+		startGame.setVisible(false);
 
-		textField2 = new JTextField("Default text");
-		this.add(textField2);
+		JButton exitGame = new JButton("Desistir da Partida");
+		exitGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
+		exitGame.setVisible(false);
 
-		textField3 =  new JTextField("Non-editable", 12);
-		textField3.setEditable(false);
-		this.add(textField3);
+		JButton playButton = new JButton("Efetuar Jogada");
+		playButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
+		playButton.setVisible(false);
 
-		pass = new JPasswordField("Hidden text");
-		this.add(pass);
+		JButton hostButton = new JButton("Criar Sessao");
+		hostButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
+		hostButton.setVisible(true);
 
-		button = new JButton("MyButton");
-		this.add(button);
+		JTextArea typeHere = new JTextArea();
+		JScrollPane textArea = new JScrollPane(typeHere);
+		textArea.setBounds(0*WIDTH, HEIGHT/2, WIDTH, HEIGHT/3);
+		textArea.setVisible(false);
 
-		ActionListener observer = new MyHandler();
-		textField1.addActionListener(observer);
-		textField2.addActionListener(observer);
-		textField3.addActionListener(observer);
-		pass.addActionListener(observer);
-		button.addActionListener(observer);
+		Icon img = new ImageIcon(getClass().getClassLoader().getResource("wol.jpeg"));
+		JLabel placeHolder = new JLabel(img);
+		placeHolder.setVisible(false);
+		placeHolder.setBounds(0*WIDTH, 0*HEIGHT + 30, WIDTH, HEIGHT/3 + height);
 
-
-		bold = new JCheckBox("Bold");
-		this.add(bold);
-
-		italic = new JCheckBox("Italic");
-		this.add(italic);
-
-		ItemListener listener = new MyListener();
-		bold.addItemListener(listener);
-		italic.addItemListener(listener);
-	}
-
-
-	private class MyHandler implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent event) {
-			String str = "";
-
-			if (event.getSource() == textField1) {
-				str = String.format("Field 1: %s", event.getActionCommand());
-			} else if (event.getSource() == textField2) {
-				str = String.format("Field 2: %s", event.getActionCommand());
-			} else if (event.getSource() == textField3) {
-				str = String.format("Field 3: %s", event.getActionCommand());
-			} else if (event.getSource() == pass) {
-				str = String.format("Password field: %s", event.getActionCommand());
-			} else {
-				str = String.format("Event activated by %s", event.getActionCommand());
+		connectButton.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				disconnectButton.setVisible(true);
+				connectButton.setVisible(false);
+				startGame.setVisible(true);
+				hostButton.setVisible(false);
 			}
+		});
 
-			JOptionPane.showMessageDialog(Client.this, str);
-		}
-	}
-
-	private class MyListener implements ItemListener {
-		@Override
-		public void itemStateChanged(ItemEvent ev) {
-			Font font = null;
-
-			if (bold.isSelected() && italic.isSelected()) {
-				font = new Font("Arial", Font.BOLD + Font.ITALIC, 14);
-			} else if (bold.isSelected()) {
-				font = new Font("Serif", Font.BOLD, 14);
-			} else if (italic.isSelected()) {
-				font = new Font("Courier New", Font.ITALIC, 14);
-			} else {
-				font = new Font("Serif", Font.PLAIN, 14);
+		disconnectButton.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				disconnectButton.setVisible(false);
+				connectButton.setVisible(true);
+				startGame.setVisible(false);
+				exitGame.setVisible(false);
+				playButton.setVisible(false);
+				hostButton.setVisible(true);
 			}
+		});
 
-			label1.setFont(font);
-		}
+		startGame.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				startGame.setVisible(false);
+				exitGame.setVisible(true);
+				playButton.setVisible(true);
+				textArea.setVisible(true);
+				placeHolder.setVisible(true);
+			}
+		});
+
+		exitGame.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				startGame.setVisible(true);
+				exitGame.setVisible(false);
+				playButton.setVisible(false);
+				textArea.setVisible(false);
+				placeHolder.setVisible(false);
+			}
+		});
+
+		hostButton.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				disconnectButton.setVisible(true);
+				connectButton.setVisible(false);
+				startGame.setVisible(true);
+				hostButton.setVisible(false);
+			}
+		});
+
+		this.add(connectButton);
+		this.add(disconnectButton);
+		this.add(startGame);
+		this.add(exitGame);
+		this.add(playButton);
+		this.add(textArea);
+		this.add(hostButton);
+		this.add(placeHolder);
 	}
 
 }
-
