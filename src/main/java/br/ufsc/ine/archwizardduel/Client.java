@@ -1,118 +1,130 @@
 package br.ufsc.ine.archwizardduel;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.JOptionPane;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-public class Client extends ApplicationAdapter {
-	private Stage stage;
 
-	@Override
-	public void create () {
-		stage = new Stage(new ScreenViewport());
+public class Client extends JFrame {
 
-		Skin buttonSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
-		final Button playButton = new TextButton("Play", buttonSkin, "small");
-		playButton.setPosition(600, 1);
-		playButton.setSize(200, 50);
+	private JLabel label1, label2, label3;
+	private JTextField textField1, textField2, textField3;
+	private JPasswordField pass;
+	private JButton button;
+	private JCheckBox bold, italic;
 
-		final Button newButton = new TextButton("New Game", buttonSkin, "small");
-		newButton.setPosition(0, 1);
-		newButton.setSize(120, 50);
 
-		final Button disconnectButton = new TextButton("Disconnect", buttonSkin, "small");
-		disconnectButton.setPosition(120, 1);
-		disconnectButton.setSize(120, 50);
+	public Client() {
+		super("Testing JLabel");
+		setLayout(new FlowLayout());
 
-		final Button quitButton = new TextButton("Quit Game", buttonSkin, "small");
-		quitButton.setPosition(120, 1);
-		quitButton.setSize(120, 50);
-		quitButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				quitButton.remove();
-				stage.addActor(newButton);
-				stage.addActor(disconnectButton);
-				playButton.remove();
-				return true;
-			}
-		});
+		Font font = new Font("Arial", Font.PLAIN, 14);
 
-		final Button configButton = new TextButton("Connect...", buttonSkin, "small");
-		configButton.setPosition(0, 1);
-		configButton.setSize(120, 50);
-		stage.addActor(configButton);
-		configButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				stage.addActor(newButton);
-				stage.addActor(disconnectButton);
-				configButton.remove();
+		label1 = new JLabel("JLabel text");
+		label1.setFont(font);
+		label1.setToolTipText("L1 Tooltip");
+		this.add(label1);
 
-				return true;
-			}
-		});
+		Icon bug = new ImageIcon("bug.png");
+		label2 = new JLabel("JLabel with Icon", bug, SwingConstants.LEFT);
+		label2.setToolTipText("Another JLabel tooltip");
+		this.add(label2);
 
-		final Button sessionButton = new TextButton("New Session", buttonSkin, "small");
-		sessionButton.setPosition(120, 1);
-		sessionButton.setSize(120, 50);
-		stage.addActor(sessionButton);
-		sessionButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				stage.addActor(newButton);
-				stage.addActor(disconnectButton);
-				configButton.remove();
-				return true;
-			}
-		});
+		label3 = new JLabel("JLabel with added stuff");
+		label3.setIcon(bug);
+		label3.setHorizontalTextPosition(SwingConstants.CENTER);
+		label3.setVerticalTextPosition(SwingConstants.BOTTOM);
+		label3.setToolTipText("Yet another tip");
+		this.add(label3);
 
-		disconnectButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				disconnectButton.remove();
-				stage.addActor(configButton);
-				stage.addActor(sessionButton);
-				return true;
-			}
-		});
+		textField1 = new JTextField(10);
+		this.add(textField1);
 
-		newButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				stage.addActor(playButton);
-				disconnectButton.remove();
-				stage.addActor(quitButton);
-				newButton.remove();
-				return true;
-			}
-		});
+		textField2 = new JTextField("Default text");
+		this.add(textField2);
 
-		TextField usernameTextField = new TextField("This is a GUI prototype", buttonSkin);
-		usernameTextField.setPosition(0,52);
-		usernameTextField.setSize(800, 247);
-		stage.addActor(usernameTextField);
+		textField3 =  new JTextField("Non-editable", 12);
+		textField3.setEditable(false);
+		this.add(textField3);
 
-		Gdx.input.setInputProcessor(stage);
+		pass = new JPasswordField("Hidden text");
+		this.add(pass);
 
-		Texture guiTest = new Texture(Gdx.files.internal("wol.jpeg"));
-		Image gui = new Image(guiTest);
-		gui.setSize(800, 300);
-		gui.setPosition(0,300);
-		stage.addActor(gui);
+		button = new JButton("MyButton");
+		this.add(button);
+
+		ActionListener observer = new MyHandler();
+		textField1.addActionListener(observer);
+		textField2.addActionListener(observer);
+		textField3.addActionListener(observer);
+		pass.addActionListener(observer);
+		button.addActionListener(observer);
+
+
+		bold = new JCheckBox("Bold");
+		this.add(bold);
+
+		italic = new JCheckBox("Italic");
+		this.add(italic);
+
+		ItemListener listener = new MyListener();
+		bold.addItemListener(listener);
+		italic.addItemListener(listener);
 	}
 
-	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		stage.act();
-		stage.draw();
+
+	private class MyHandler implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			String str = "";
+
+			if (event.getSource() == textField1) {
+				str = String.format("Field 1: %s", event.getActionCommand());
+			} else if (event.getSource() == textField2) {
+				str = String.format("Field 2: %s", event.getActionCommand());
+			} else if (event.getSource() == textField3) {
+				str = String.format("Field 3: %s", event.getActionCommand());
+			} else if (event.getSource() == pass) {
+				str = String.format("Password field: %s", event.getActionCommand());
+			} else {
+				str = String.format("Event activated by %s", event.getActionCommand());
+			}
+
+			JOptionPane.showMessageDialog(Client.this, str);
+		}
 	}
+
+	private class MyListener implements ItemListener {
+		@Override
+		public void itemStateChanged(ItemEvent ev) {
+			Font font = null;
+
+			if (bold.isSelected() && italic.isSelected()) {
+				font = new Font("Arial", Font.BOLD + Font.ITALIC, 14);
+			} else if (bold.isSelected()) {
+				font = new Font("Serif", Font.BOLD, 14);
+			} else if (italic.isSelected()) {
+				font = new Font("Courier New", Font.ITALIC, 14);
+			} else {
+				font = new Font("Serif", Font.PLAIN, 14);
+			}
+
+			label1.setFont(font);
+		}
+	}
+
 }
+
