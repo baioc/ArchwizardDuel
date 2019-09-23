@@ -1,13 +1,14 @@
 package br.ufsc.ine.archwizardduel;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import javax.swing.JFrame;
 
-public class Game { // aka DesktopLauncher
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 800;
-		config.height = 600;
-		new LwjglApplication(new Client(), config);
+public class Game {
+
+	public static void main(String[] args) {
+		JFrame gameWindow = new Client();
+		gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		gameWindow.setLayout(null);
+		gameWindow.setVisible(true);
 	}
+
 }

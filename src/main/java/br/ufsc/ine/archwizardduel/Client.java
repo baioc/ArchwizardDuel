@@ -1,118 +1,111 @@
 package br.ufsc.ine.archwizardduel;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
-public class Client extends ApplicationAdapter {
-	private Stage stage;
+public class Client extends JFrame {
 
-	@Override
-	public void create () {
-		stage = new Stage(new ScreenViewport());
+	private static final int WIDTH = 800;
+	private static final int HEIGHT = 600;
 
-		Skin buttonSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
-		final Button playButton = new TextButton("Play", buttonSkin, "small");
-		playButton.setPosition(600, 1);
-		playButton.setSize(200, 50);
+	public Client() {
+		super("Archwizard Duel");
 
-		final Button newButton = new TextButton("New Game", buttonSkin, "small");
-		newButton.setPosition(0, 1);
-		newButton.setSize(120, 50);
+		this.setSize(WIDTH, HEIGHT);
 
-		final Button disconnectButton = new TextButton("Disconnect", buttonSkin, "small");
-		disconnectButton.setPosition(120, 1);
-		disconnectButton.setSize(120, 50);
+		int width = 200;
+		int height = 30;
 
-		final Button quitButton = new TextButton("Quit Game", buttonSkin, "small");
-		quitButton.setPosition(120, 1);
-		quitButton.setSize(120, 50);
-		quitButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				quitButton.remove();
-				stage.addActor(newButton);
-				stage.addActor(disconnectButton);
-				playButton.remove();
-				return true;
+		JButton connectButton = new JButton("Conectar a Sessao");
+		connectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
+
+		JButton disconnectButton = new JButton("Desconectar da Sessao");
+		disconnectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
+		disconnectButton.setVisible(false);
+
+		JButton startGame = new JButton("Iniciar Partida");
+		startGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
+		startGame.setVisible(false);
+
+		JButton exitGame = new JButton("Desistir da Partida");
+		exitGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
+		exitGame.setVisible(false);
+
+		JButton playButton = new JButton("Efetuar Jogada");
+		playButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
+		playButton.setVisible(false);
+
+		JButton hostButton = new JButton("Criar Sessao");
+		hostButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
+		hostButton.setVisible(true);
+
+		JTextArea typeHere = new JTextArea();
+		JScrollPane textArea = new JScrollPane(typeHere);
+		textArea.setBounds(0*WIDTH, HEIGHT/2, WIDTH, HEIGHT/3);
+		textArea.setVisible(false);
+
+		Icon img = new ImageIcon(getClass().getClassLoader().getResource("wol.jpeg"));
+		JLabel placeHolder = new JLabel(img);
+		placeHolder.setVisible(false);
+		placeHolder.setBounds(0*WIDTH, 0*HEIGHT + 30, WIDTH, HEIGHT/3 + height);
+
+		connectButton.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				disconnectButton.setVisible(true);
+				connectButton.setVisible(false);
+				startGame.setVisible(true);
+				hostButton.setVisible(false);
 			}
 		});
 
-		final Button configButton = new TextButton("Connect...", buttonSkin, "small");
-		configButton.setPosition(0, 1);
-		configButton.setSize(120, 50);
-		stage.addActor(configButton);
-		configButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				stage.addActor(newButton);
-				stage.addActor(disconnectButton);
-				configButton.remove();
-
-				return true;
+		disconnectButton.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				disconnectButton.setVisible(false);
+				connectButton.setVisible(true);
+				startGame.setVisible(false);
+				exitGame.setVisible(false);
+				playButton.setVisible(false);
+				hostButton.setVisible(true);
 			}
 		});
 
-		final Button sessionButton = new TextButton("New Session", buttonSkin, "small");
-		sessionButton.setPosition(120, 1);
-		sessionButton.setSize(120, 50);
-		stage.addActor(sessionButton);
-		sessionButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				stage.addActor(newButton);
-				stage.addActor(disconnectButton);
-				configButton.remove();
-				return true;
+		startGame.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				startGame.setVisible(false);
+				exitGame.setVisible(true);
+				playButton.setVisible(true);
+				textArea.setVisible(true);
+				placeHolder.setVisible(true);
 			}
 		});
 
-		disconnectButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				disconnectButton.remove();
-				stage.addActor(configButton);
-				stage.addActor(sessionButton);
-				return true;
+		exitGame.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				startGame.setVisible(true);
+				exitGame.setVisible(false);
+				playButton.setVisible(false);
+				textArea.setVisible(false);
+				placeHolder.setVisible(false);
 			}
 		});
 
-		newButton.addListener(new InputListener() {
-			@Override
-			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				stage.addActor(playButton);
-				disconnectButton.remove();
-				stage.addActor(quitButton);
-				newButton.remove();
-				return true;
+		hostButton.addActionListener(new java.awt.event.ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				disconnectButton.setVisible(true);
+				connectButton.setVisible(false);
+				startGame.setVisible(true);
+				hostButton.setVisible(false);
 			}
 		});
 
-		TextField usernameTextField = new TextField("This is a GUI prototype", buttonSkin);
-		usernameTextField.setPosition(0,52);
-		usernameTextField.setSize(800, 247);
-		stage.addActor(usernameTextField);
-
-		Gdx.input.setInputProcessor(stage);
-
-		Texture guiTest = new Texture(Gdx.files.internal("wol.jpeg"));
-		Image gui = new Image(guiTest);
-		gui.setSize(800, 300);
-		gui.setPosition(0,300);
-		stage.addActor(gui);
+		this.add(connectButton);
+		this.add(disconnectButton);
+		this.add(startGame);
+		this.add(exitGame);
+		this.add(playButton);
+		this.add(textArea);
+		this.add(hostButton);
+		this.add(placeHolder);
 	}
 
-	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		stage.act();
-		stage.draw();
-	}
 }
