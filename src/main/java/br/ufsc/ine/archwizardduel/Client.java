@@ -7,97 +7,93 @@ public class Client extends JFrame {
 
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
+	private LocalPlayer player;
+	private Interpreter parser;
+	private Server server;
+	private Session link;
+	private Arena match;
+	private boolean onGoingMatch;
+	private JButton connectButton;
+	private JButton disconnectButton;
+	private JButton exitGame;
+	private JButton startGame;
+	private JButton playButton;
+	private JButton hostButton;
+	private JScrollPane textArea;
+	private JLabel placeHolder;
+	private boolean isConnected;
 
-	public Client() {
+	public Client(Server server) {
 		super("Archwizard Duel");
 
-		this.setSize(WIDTH, HEIGHT);
+		player = null;
+		link = null;
 
+		this.server = server;
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		this.setSize(WIDTH, HEIGHT);
 		int width = 200;
 		int height = 30;
 
-		JButton connectButton = new JButton("Conectar a Sessao");
+		connectButton = new JButton("Conectar a Sessao");
 		connectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
 
-		JButton disconnectButton = new JButton("Desconectar da Sessao");
+		disconnectButton = new JButton("Desconectar da Sessao");
 		disconnectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
-		disconnectButton.setVisible(false);
 
-		JButton startGame = new JButton("Iniciar Partida");
+		startGame = new JButton("Iniciar Partida");
 		startGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
-		startGame.setVisible(false);
 
-		JButton exitGame = new JButton("Desistir da Partida");
+		exitGame = new JButton("Desistir da Partida");
 		exitGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
-		exitGame.setVisible(false);
 
-		JButton playButton = new JButton("Efetuar Jogada");
+		playButton = new JButton("Efetuar Jogada");
 		playButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
-		playButton.setVisible(false);
 
-		JButton hostButton = new JButton("Criar Sessao");
+		hostButton = new JButton("Criar Sessao");
 		hostButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
-		hostButton.setVisible(true);
 
 		JTextArea typeHere = new JTextArea();
-		JScrollPane textArea = new JScrollPane(typeHere);
+		textArea = new JScrollPane(typeHere);
 		textArea.setBounds(0*WIDTH, HEIGHT/2, WIDTH, HEIGHT/3);
-		textArea.setVisible(false);
 
 		Icon img = new ImageIcon(getClass().getClassLoader().getResource("wol.jpeg"));
-		JLabel placeHolder = new JLabel(img);
-		placeHolder.setVisible(false);
+		placeHolder = new JLabel(img);
 		placeHolder.setBounds(0*WIDTH, 0*HEIGHT + 30, WIDTH, HEIGHT/3 + height);
 
 		connectButton.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				disconnectButton.setVisible(true);
-				connectButton.setVisible(false);
-				startGame.setVisible(true);
-				hostButton.setVisible(false);
+				showSession(onJoinSession());
 			}
 		});
 
 		disconnectButton.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				disconnectButton.setVisible(false);
-				connectButton.setVisible(true);
-				startGame.setVisible(false);
-				exitGame.setVisible(false);
-				playButton.setVisible(false);
-				hostButton.setVisible(true);
+				showSession(false);
 			}
 		});
 
 		startGame.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				startGame.setVisible(false);
-				exitGame.setVisible(true);
-				playButton.setVisible(true);
-				textArea.setVisible(true);
-				placeHolder.setVisible(true);
+				showMatch(true, true);
 			}
 		});
 
 		exitGame.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				startGame.setVisible(true);
-				exitGame.setVisible(false);
-				playButton.setVisible(false);
-				textArea.setVisible(false);
-				placeHolder.setVisible(false);
+				showMatch(false, false);
 			}
 		});
 
 		hostButton.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				disconnectButton.setVisible(true);
-				connectButton.setVisible(false);
-				startGame.setVisible(true);
-				hostButton.setVisible(false);
+				onMakeSession();
+				showSession(true);
 			}
 		});
 
+		showBegin();
 		this.add(connectButton);
 		this.add(disconnectButton);
 		this.add(startGame);
@@ -108,4 +104,103 @@ public class Client extends JFrame {
 		this.add(placeHolder);
 	}
 
+	public Player getPlayer() {
+		if (player == null) {
+			player = new LocalPlayer(
+				JOptionPane.showInputDialog(this,
+					"Please enter your nickname for this match:"
+				),
+				this
+			);
+		}
+		return player;
+	}
+
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog(this, msg);
+	}
+
+	/*
+	public boolean onPlayerJoin(Player remotePlayer) {
+		// TODO
+	}
+
+	public void onPlayerQuit(Player remotePlayer) {
+		// TODO
+	}
+	*/
+
+	public void onMatchEnd(Player winner) {
+		JOptionPane.showMessageDialog(this,
+            "Congratulations "+player+"! You did it!",
+            "End of match",
+            JOptionPane.PLAIN_MESSAGE);
+	}
+
+	public boolean onJoinSession() {
+		while (link == null) {
+			String ip = JOptionPane.showInputDialog(this, "Enter IP to join session", null);
+
+			if ((link = server.joinSession(this, ip)) != null)
+				return true;
+
+			int n = JOptionPane.showConfirmDialog(
+				this,
+				"Failed to connect using ip "+ip+". Would you like to try again?",
+				"Connection error",
+				JOptionPane.YES_NO_OPTION
+			);
+
+			if (n == 0)
+				continue;
+			else
+				return false;
+		}
+	}
+
+	public void onMakeSession() {
+		server.makeSession(this);
+	}
+
+	public void onQuitSession() {
+		server.quitSession();
+		showBegin();
+	}
+
+	/*
+		Update screen when you go back to the initial screen
+	*/
+	public void showBegin() {
+		disconnectButton.setVisible(false);
+		startGame.setVisible(false);
+		exitGame.setVisible(false);
+		playButton.setVisible(false);
+		hostButton.setVisible(true);
+		textArea.setVisible(false);
+		placeHolder.setVisible(false);
+	}
+
+	/*
+		Update screen when you join a session
+	*/
+	public void showSession(boolean onSession) {
+		disconnectButton.setVisible(onSession);
+		connectButton.setVisible(!onSession);
+		startGame.setVisible(onSession);
+		exitGame.setVisible(false);
+		playButton.setVisible(false);
+		hostButton.setVisible(!onSession);
+	}
+
+	/*
+		Update screen when you join a match
+	*/
+	public void showMatch(boolean onMatch, boolean yourTurn) {
+		placeHolder.setVisible(onMatch);
+		startGame.setVisible(!onMatch);
+		exitGame.setVisible(onMatch);
+		playButton.setVisible(yourTurn);
+        textArea.setVisible(onMatch);
+		placeHolder.setVisible(onMatch);
+    }
 }
