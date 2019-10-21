@@ -35,6 +35,13 @@ public class Client extends JFrame {
 		int width = 200;
 		int height = 30;
 
+		player = new LocalPlayer(
+				JOptionPane.showInputDialog(this,
+					"Please enter your nickname for this match:"
+				),
+				this
+			);
+
 		connectButton = new JButton("Conectar a Sessao");
 		connectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
 
@@ -83,14 +90,14 @@ public class Client extends JFrame {
 		exitGame.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				showMatch(false, false);
-				server.quitSession();
 			}
 		});
 
 		hostButton.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				onMakeSession();
-				showSession(true);
+				if (onMakeSession()) {
+					showSession(true);
+				}
 			}
 		});
 
@@ -106,14 +113,6 @@ public class Client extends JFrame {
 	}
 
 	public Player getPlayer() {
-		if (player == null) {
-			player = new LocalPlayer(
-				JOptionPane.showInputDialog(this,
-					"Please enter your nickname for this match:"
-				),
-				this
-			);
-		}
 		return player;
 	}
 
@@ -160,8 +159,10 @@ public class Client extends JFrame {
 		return true;
 	}
 
-	public void onMakeSession() {
-		server.makeSession(this);
+	public boolean onMakeSession() {
+		if (server.makeSession(this) == null) {
+			return false;
+		} return true;
 	}
 
 	public void onQuitSession() {
@@ -180,6 +181,7 @@ public class Client extends JFrame {
 		hostButton.setVisible(true);
 		textArea.setVisible(false);
 		placeHolder.setVisible(false);
+		this.repaint();
 	}
 
 	/*
@@ -192,6 +194,7 @@ public class Client extends JFrame {
 		exitGame.setVisible(false);
 		playButton.setVisible(false);
 		hostButton.setVisible(!onSession);
+		this.repaint();
 	}
 
 	/*
@@ -204,5 +207,6 @@ public class Client extends JFrame {
 		playButton.setVisible(yourTurn);
         textArea.setVisible(onMatch);
 		placeHolder.setVisible(onMatch);
+		this.repaint();
     }
 }
