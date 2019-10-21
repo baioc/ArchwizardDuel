@@ -21,7 +21,6 @@ public class Client extends JFrame {
 	private JButton hostButton;
 	private JScrollPane textArea;
 	private JLabel placeHolder;
-	private boolean isConnected;
 
 	public Client(Server server) {
 		super("Archwizard Duel");
@@ -71,6 +70,7 @@ public class Client extends JFrame {
 		disconnectButton.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				showSession(false);
+				server.quitSession();
 			}
 		});
 
@@ -83,6 +83,7 @@ public class Client extends JFrame {
 		exitGame.addActionListener(new java.awt.event.ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				showMatch(false, false);
+				server.quitSession();
 			}
 		});
 
@@ -156,6 +157,7 @@ public class Client extends JFrame {
 			else
 				return false;
 		}
+		return true;
 	}
 
 	public void onMakeSession() {

@@ -84,14 +84,14 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberMensagem(String msg) {
-		if (msg.matches("JOIN: ")) {
+		if (msg.contains("JOIN: ")) {
 			final String userName = msg.substring(6);
 			if (!userName.equals(proxy.getNomeJogador())) {
 				user.showMessage(userName + " entrou na sessão.");
 				user.showMatch(true, true); // enable match begin with enough players
 			}
 
-		} else if (msg.matches("QUIT: ")) {
+		} else if (msg.contains("QUIT: ")) {
 			final String userName = msg.substring(6);
 			if (!userName.equals(proxy.getNomeJogador())) {
 				user.showMessage(userName + " saiu da sessão.");
