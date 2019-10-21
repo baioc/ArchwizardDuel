@@ -20,6 +20,14 @@ class Session {
 		// @TODO
 	}
 
+	public void quitMatch() {
+		// @TODO
+	}
+
+	void sendCode(Expression code) {
+		// @TODO
+	}
+
 	// Expression receive();
 	// boolean send(); // ack?
 

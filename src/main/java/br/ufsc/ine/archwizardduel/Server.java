@@ -78,6 +78,18 @@ public class Server implements OuvidorProxy {
 		user = null;
 	}
 
+	public void makeMatch() {
+		
+	}
+
+	public void quitMatch() {
+		// @TODO
+	}
+
+	public void sendCode(Expression code) {
+		// @TODO
+	}
+
 	/**************************************************************************/
 	/**************************** Ouvidor Proxy *******************************/
 	/**************************************************************************/
