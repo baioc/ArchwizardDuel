@@ -18,4 +18,8 @@ class Arena {
     private int coinflip() {
         return ThreadLocalRandom.current().nextInt(0, 2);
     }
+
+    public boolean myTurn() {
+        return currentTurn == 0;
+    }
 }

@@ -1,7 +1,13 @@
 package br.ufsc.ine.archwizardduel;
 
-import br.ufsc.inf.leobr.cliente.*;
-import br.ufsc.inf.leobr.cliente.exception.*;
+import br.ufsc.inf.leobr.cliente.Jogada;
+import br.ufsc.inf.leobr.cliente.OuvidorProxy;
+import br.ufsc.inf.leobr.cliente.Proxy;
+import br.ufsc.inf.leobr.cliente.exception.ArquivoMultiplayerException;
+import br.ufsc.inf.leobr.cliente.exception.JahConectadoException;
+import br.ufsc.inf.leobr.cliente.exception.NaoConectadoException;
+import br.ufsc.inf.leobr.cliente.exception.NaoJogandoException;
+import br.ufsc.inf.leobr.cliente.exception.NaoPossivelConectarException;
 
 public class Server implements OuvidorProxy {
 
@@ -79,15 +85,21 @@ public class Server implements OuvidorProxy {
 	}
 
 	public void makeMatch() {
-		
+		try {
+			proxy.iniciarPartida(2);
+		} catch (NaoConectadoException ex) {}
 	}
 
 	public void quitMatch() {
-		// @TODO
+		try {
+			proxy.finalizarPartida();
+		} catch (NaoConectadoException | NaoJogandoException ex) {}
 	}
 
 	public void sendCode(Expression code) {
-		// @TODO
+		try {
+			proxy.enviaJogada((Jogada) code);
+		} catch (NaoJogandoException ex) {}
 	}
 
 	/**************************************************************************/
@@ -127,22 +139,23 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void iniciarNovaPartida(Integer posicao) {
-		// @TODO
+		user.showMessage("Partida inicializada!");
 	}
 
 	@Override
-	public void tratarPartidaNaoIniciada(String message) {
+	public void tratarPartidaNaoIniciada(String message) { // should never happen.
+		user.showMessage("Partida nao inicializada! Erro " + message);
 		tratarConexaoPerdida();
 	}
 
 	@Override
 	public void finalizarPartidaComErro(String message) {
-		// @TODO
+		user.showMessage("Partida finalizada com erro!");
+		tratarConexaoPerdida();
 	}
 
 	@Override
 	public void receberJogada(Jogada jogada) {
-		// @TODO
+		user.showMessage("Jogada recebida!");
 	}
-
 }
