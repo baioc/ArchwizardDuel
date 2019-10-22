@@ -27,9 +27,11 @@ public class Server implements OuvidorProxy {
 		user = host;
 		System.out.println("connecting to localhost: " + user.getPlayer().getName());
 		try {
-			localHost = true;
 			proxy.conectar("localhost", user.getPlayer().getName());
 			connection = new Session(this);
+			localHost = true;
+			connection.setRemotePlayer(new RemotePlayer("REMOTE", connection));
+
 			return connection;
 		} catch (JahConectadoException | NaoPossivelConectarException | ArquivoMultiplayerException ex) {
 			ex.printStackTrace();
@@ -45,8 +47,9 @@ public class Server implements OuvidorProxy {
 			proxy.conectar(ip, userName);
 			connection = new Session(this);
 			localHost = false;
-			proxy.receberMensagem('J' + userName);
+			// proxy.receberMensagem('J' + userName); create remotePlayer?
 			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
+
 			return connection;
 		} catch (JahConectadoException |ArquivoMultiplayerException | NaoPossivelConectarException ex) {
 			ex.printStackTrace();
@@ -68,7 +71,6 @@ public class Server implements OuvidorProxy {
 	}
 
 	public void makeMatch() {
-		System.out.println("MAKE MATCH!\n\n, localhost? " + localHost);
 		try {
 			proxy.iniciarPartida(2);
 		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
@@ -92,12 +94,12 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberMensagem(String msg) {
-		switch(msg.charAt(0)) {
-			case 'J':
-				connection.setRemotePlayer(new RemotePlayer(msg.substring(1), connection));
-			case 'Q':
-				break;
-		}
+		// switch(msg.charAt(0)) { how to pass messages?
+		// 	case 'J':
+		// 		connection.setRemotePlayer(new RemotePlayer(msg.substring(1), connection));
+		// 	case 'Q':
+		// 		break;
+		// }
 	}
 
 	@Override
@@ -107,7 +109,7 @@ public class Server implements OuvidorProxy {
 		connection = null;
 		try {
 			proxy.desconectar();
-		} catch (NaoConectadoException e) {}
+		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
 
 		user.showBegin(); // disable session interface
 		user = null;
@@ -116,7 +118,7 @@ public class Server implements OuvidorProxy {
 	@Override
 	public void iniciarNovaPartida(Integer posicao) { // only remote should end here.
 		try {
-			user.match = connection.makeMatch(user.localPlayer);	
+			user.match = connection.joinMatch(user.localPlayer);	
 		} catch (NullPointerException FIXME) { FIXME.printStackTrace(); }
 		
 		user.showMatch();

@@ -14,6 +14,10 @@ class Session {
 		return new Arena(new Player[]{localPlayer, remotePlayer}, 0);
 	}
 
+	Arena joinMatch(LocalPlayer localPlayer) {
+		return new Arena(new Player[]{localPlayer, remotePlayer}, 1);
+	}
+
 	// give-up match.
 	void quitMatch() {
 		server.quitMatch();

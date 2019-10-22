@@ -148,10 +148,6 @@ public class Client extends JFrame {
 
 	private void onExitGame() {
 		connection.quitMatch();
-		JOptionPane.showMessageDialog(this,
-            "Congratulations " + connection.getRemotePlayerName() + "! You did it!",
-            "End of match",
-			JOptionPane.PLAIN_MESSAGE);
 		showSession();
 	}
 
