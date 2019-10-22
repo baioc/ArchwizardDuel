@@ -10,17 +10,13 @@ class Session {
 	}
 
 	Arena makeMatch(LocalPlayer localPlayer) {
+		server.makeMatch();
 		return new Arena(new Player[]{localPlayer, remotePlayer}, 0);
 	}
 
 	// give-up match.
 	void quitMatch() {
 		server.quitMatch();
-	}
-
-	// tried to connect with not enough players.
-	void dropMatch() {
-		server.tratarPartidaNaoIniciada("Not enought players!");
 	}
 
 	// send through proxy.

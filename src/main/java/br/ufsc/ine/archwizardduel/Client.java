@@ -147,15 +147,20 @@ public class Client extends JFrame {
 	}
 
 	private void onExitGame() {
-		endMatch(connection.getRemotePlayerName());
+		connection.quitMatch();
+		JOptionPane.showMessageDialog(this,
+            "Congratulations " + connection.getRemotePlayerName() + "! You did it!",
+            "End of match",
+			JOptionPane.PLAIN_MESSAGE);
+		showSession();
 	}
 
-	private void onStartGame() {
-		if (connection.enoughParticipants()) {
+	private void onStartGame() { // what if they both try to start?
+		if (server.connection.enoughParticipants()) {
 			match = connection.makeMatch(localPlayer);
 			showMatch();
 		} else {
-			connection.dropMatch();
+			showMessage("Not enough players!");
 		}
 	}
 
@@ -179,7 +184,7 @@ public class Client extends JFrame {
 
 			int n = JOptionPane.showConfirmDialog(
 				this,
-				"Failed to connect using ip "+ip+". Would you like to try again?",
+				"Failed to connect using ip " + ip + ". Would you like to try again?",
 				"Connection error",
 				JOptionPane.YES_NO_OPTION
 			);
@@ -192,19 +197,12 @@ public class Client extends JFrame {
 		return true;
 	}
 
-	private void endMatch(String winner) {
-		JOptionPane.showMessageDialog(this,
-            "Congratulations " + winner +"! You did it!",
-            "End of match",
-			JOptionPane.PLAIN_MESSAGE);
-			match = null;
-	}
-
 	/*
 		Update screen when you go back to the initial screen
 	*/
 	public void showBegin() {
 		connection = null;
+		match = null;
 		connectButton.setVisible(true);
 		disconnectButton.setVisible(false);
 		exitGame.setVisible(false);
@@ -221,6 +219,7 @@ public class Client extends JFrame {
 		Update screen when you join a session
 	*/
 	public void showSession() {
+		match = null;
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(true);
 		exitGame.setVisible(false);

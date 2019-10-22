@@ -13,7 +13,7 @@ public class Server implements OuvidorProxy {
 
 	private Proxy proxy;
 	private Client user;
-	private Session connection;
+	public Session connection;
 	private boolean localHost;
 
 
@@ -30,20 +30,10 @@ public class Server implements OuvidorProxy {
 			localHost = true;
 			proxy.conectar("localhost", user.getPlayer().getName());
 			connection = new Session(this);
-		} catch (JahConectadoException e) {
-			e.printStackTrace(); // Should not be possible.
-		} catch (NaoPossivelConectarException e) {
-			user.showMessage(
-				"Não foi possível conectar, certifique-se de que o " +
-				"servidor NetGames ('server.jar') está rodando."
-			);
-		} catch (ArquivoMultiplayerException e) {
-			user.showMessage(
-				"Não foi possível ler o arquivo de configuração " +
-				"do NetGames ('jogoMultiPlayer.properties')."
-			);
-		} finally {
 			return connection;
+		} catch (JahConectadoException | NaoPossivelConectarException | ArquivoMultiplayerException ex) {
+			ex.printStackTrace();
+			return null;
 		}
 	}
 
@@ -52,22 +42,15 @@ public class Server implements OuvidorProxy {
 		System.out.println("connecting to" + ip + ": "+ user.getPlayer().getName());
 		try {
 			final String userName = user.getPlayer().getName();
-			localHost = false;
 			proxy.conectar(ip, userName);
-			proxy.receberMensagem('J' + userName);
 			connection = new Session(this);
-			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversario(0), connection));
-		} catch (JahConectadoException e) {
-			e.printStackTrace(); // Should not be possible.
-		} catch (NaoPossivelConectarException e) {
-			user.showMessage("Não foi possível conectar ao servidor.");
-		} catch (ArquivoMultiplayerException e) {
-			user.showMessage(
-				"Não foi possível ler do arquivo de configuração " +
-				"do NetGames ('jogoMultiPlayer.properties')."
-			);
-		} finally {
+			localHost = false;
+			proxy.receberMensagem('J' + userName);
+			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
 			return connection;
+		} catch (JahConectadoException |ArquivoMultiplayerException | NaoPossivelConectarException ex) {
+			ex.printStackTrace();
+			return null;
 		}
 	}
 
@@ -80,28 +63,27 @@ public class Server implements OuvidorProxy {
 
 		try {
 			proxy.desconectar();
-		} catch (NaoConectadoException e) {
-			e.printStackTrace(); // Should not be possible.
-		}
+		} catch (NaoConectadoException ex) { ex.printStackTrace(); } // Should not be possible.
 		user = null;
 	}
 
 	public void makeMatch() {
+		System.out.println("MAKE MATCH!\n\n, localhost? " + localHost);
 		try {
 			proxy.iniciarPartida(2);
-		} catch (NaoConectadoException ex) {}
+		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
 	}
 
 	public void quitMatch() {
 		try {
 			proxy.finalizarPartida();
-		} catch (NaoConectadoException | NaoJogandoException ex) {}
+		} catch (NaoConectadoException | NaoJogandoException ex) { ex.printStackTrace(); }
 	}
 
 	public void sendCode(Expression code) {
 		try {
 			proxy.enviaJogada((Jogada) code);
-		} catch (NaoJogandoException ex) {}
+		} catch (NaoJogandoException ex) { ex.printStackTrace(); }
 	}
 
 	/**************************************************************************/
@@ -133,14 +115,16 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void iniciarNovaPartida(Integer posicao) { // only remote should end here.
-		user.match = connection.makeMatch(user.localPlayer);
+		try {
+			user.match = connection.makeMatch(user.localPlayer);	
+		} catch (NullPointerException FIXME) { FIXME.printStackTrace(); }
+		
 		user.showMatch();
 	}
 
 	@Override
 	public void tratarPartidaNaoIniciada(String message) {
-		user.showMessage("Partida nao inicializada! Erro " + message);
-		tratarConexaoPerdida();
+		// Should never happen.
 	}
 
 	@Override
