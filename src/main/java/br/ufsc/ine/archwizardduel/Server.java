@@ -21,6 +21,10 @@ public class Server implements OuvidorProxy {
 		connection = null;
 	}
 
+	public boolean bothPlayersUp() {
+		return proxy.obterNomeAdversarios().size() == 1;
+	}
+
 	public Session makeSession(Client host) {
 		user = host;
 		System.out.println("connecting to localhost: " + user.getPlayer().getName());
@@ -54,15 +58,14 @@ public class Server implements OuvidorProxy {
 	}
 
 	public void quitSession() {
-		if (connection.amIHost())
-			proxy.tratarPerdaConexao();
-
-		connection = null;
-		user.showBegin();
+		user.showMessage("Disconnected!");
 
 		try {
 			proxy.desconectar();
 		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
+		
+		connection = null;
+		user.showBegin();
 		user = null;
 	}
 
@@ -95,15 +98,7 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void tratarConexaoPerdida() {
-		user.showMessage("Disconnected!");
-
-		connection = null;
-		try {
-			proxy.desconectar();
-		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
-
-		user.showBegin(); // disable session interface
-		user = null;
+		// Unused.
 	}
 
 	@Override
@@ -119,14 +114,10 @@ public class Server implements OuvidorProxy {
 		// Should never happen.
 	}
 
-	private boolean sessionDisconnected() {
-		return proxy.obterNomeAdversarios().size() == 0;
-	}
-
 	@Override
 	public void finalizarPartidaComErro(String message) {
-		if (sessionDisconnected()) {
-			tratarConexaoPerdida();
+		if (!bothPlayersUp()) {
+			quitMatch();
 		} else {
 			user.showMessage("Match finished!");
 			user.showSession();

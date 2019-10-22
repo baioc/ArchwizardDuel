@@ -156,7 +156,7 @@ public class Client extends JFrame {
 			return;
 		}
 
-		if (connection.enoughParticipants()) {
+		if (server.bothPlayersUp()) {
 			connection.makeMatch(localPlayer);
 			showMatch();
 		} else {

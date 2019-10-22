@@ -49,10 +49,6 @@ class Session {
 
 	// REMOTE PLAYER INTERFACE.
 
-	boolean enoughParticipants() {
-		return !(remotePlayer == null);
-	}
-
 	String getRemotePlayerName() {
 		return remotePlayer.getName();
 	}
