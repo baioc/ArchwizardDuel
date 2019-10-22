@@ -16,7 +16,6 @@ public class Server implements OuvidorProxy {
 	public Session connection;
 	public boolean localHost;
 
-
 	public Server() {
 		proxy = Proxy.getInstance();
 		proxy.addOuvinte(this);
@@ -30,7 +29,7 @@ public class Server implements OuvidorProxy {
 			proxy.conectar("localhost", user.getPlayer().getName());
 			connection = new Session(this);
 			localHost = true;
-			connection.setRemotePlayer(new RemotePlayer("REMOTE", connection));
+			connection.setRemotePlayer(new RemotePlayer("REMOTE", connection)); // FIXME: properly create remote player.
 
 			return connection;
 		} catch (JahConectadoException | NaoPossivelConectarException | ArquivoMultiplayerException ex) {
@@ -94,17 +93,12 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberMensagem(String msg) {
-		// switch(msg.charAt(0)) { how to pass messages?
-		// 	case 'J':
-		// 		connection.setRemotePlayer(new RemotePlayer(msg.substring(1), connection));
-		// 	case 'Q':
-		// 		break;
-		// }
+		// Unused.
 	}
 
 	@Override
 	public void tratarConexaoPerdida() {
-		user.showMessage("A sessão foi interrompida.");
+		user.showMessage("Disconnected!");
 
 		connection = null;
 		try {
@@ -131,14 +125,14 @@ public class Server implements OuvidorProxy {
 	@Override
 	public void finalizarPartidaComErro(String message) {
 		// Should only happen from proxy.finalizarPartida.
-		user.showMessage("Partida finalizada!");
+		user.showMessage("Match finished!");
 		user.showSession();
 	}
 
 	@Override
 	public void receberJogada(Jogada jogada) { // mailbox.
 		user.match.nextTurn();
-		user.showMessage("Jogada recebida!");
+		user.showMessage("Code received!");
 		connection.receiveCode((Expression) jogada);
 	}
 }

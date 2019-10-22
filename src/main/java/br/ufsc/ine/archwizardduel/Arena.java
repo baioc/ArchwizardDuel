@@ -11,7 +11,6 @@ class Arena {
         characters[0] = new Wizard(participants[0].getName());
         characters[1] = new Wizard(participants[1].getName());
         currentTurn = goesFirst;
-        System.out.println("\n\n\n" + goesFirst + "\n\n\n");
     }
 
     public boolean myTurn() {

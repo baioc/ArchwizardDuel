@@ -48,22 +48,22 @@ public class Client extends JFrame {
 				this
 			);
 
-		connectButton = new JButton("Conectar a Sessao");
+		connectButton = new JButton("Join Session");
 		connectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
 
-		disconnectButton = new JButton("Desconectar da Sessao");
+		disconnectButton = new JButton("Quit Session");
 		disconnectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
 
-		startGame = new JButton("Iniciar Partida");
+		startGame = new JButton("Start Match");
 		startGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
 
-		exitGame = new JButton("Desistir da Partida");
+		exitGame = new JButton("Quit Match");
 		exitGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
 
-		playButton = new JButton("Efetuar Jogada");
+		playButton = new JButton("Play");
 		playButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
 
-		hostButton = new JButton("Criar Sessao");
+		hostButton = new JButton("Create Session");
 		hostButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
 
 		typeHere = new JTextArea();
@@ -151,8 +151,8 @@ public class Client extends JFrame {
 		showSession();
 	}
 
-	private void onStartGame() { // Only host can start a match.
-		if (!server.localHost) {
+	private void onStartGame() {
+		if (!server.localHost) { // Only host can start a match.
 			showMessage("Only the host can start a match!");
 			return;
 		}
@@ -169,7 +169,7 @@ public class Client extends JFrame {
 		if (match.myTurn()) {
 			match.nextTurn();	// @TODO: this order won't work if next line get's fixed.
 			connection.sendCode(null); // @TODO: add player expression & test for invalid code.
-			showMessage("Jogada enviada!");
+			showMessage("Code sent!");
 		}
 	}
 

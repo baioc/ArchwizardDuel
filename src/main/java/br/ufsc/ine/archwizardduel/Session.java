@@ -11,12 +11,10 @@ class Session {
 
 	Arena makeMatch(LocalPlayer localPlayer) {
 		server.makeMatch();
-		System.out.println("MAKEMATCH\n");
 		return new Arena(new Player[]{localPlayer, remotePlayer}, 0);
 	}
 
 	Arena joinMatch(LocalPlayer localPlayer) {
-		System.out.println("JOINMATCH\n");
 		return new Arena(new Player[]{localPlayer, remotePlayer}, 1);
 	}
 
