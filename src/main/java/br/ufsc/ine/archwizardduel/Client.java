@@ -152,7 +152,7 @@ public class Client extends JFrame {
 	}
 
 	private void onStartGame() {
-		if (!server.localHost) { // Only host can start a match.
+		if (!connection.amIHost()) { // Only host can start a match.
 			showMessage("Only the host can start a match!");
 			return;
 		}

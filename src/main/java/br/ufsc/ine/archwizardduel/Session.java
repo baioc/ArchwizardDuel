@@ -3,10 +3,12 @@ package br.ufsc.ine.archwizardduel;
 class Session {
 
 	private final Server server;
+	private final boolean localHost;
 	private RemotePlayer remotePlayer = null;
 
-	Session(Server server) {
+	Session(Server server, boolean localHost) {
 		this.server = server;
+		this.localHost = localHost;
 	}
 
 	Arena makeMatch(LocalPlayer localPlayer) {
@@ -46,5 +48,9 @@ class Session {
 
 	void setRemotePlayer(RemotePlayer remotePlayer) {
 		this.remotePlayer = remotePlayer;
+	}
+
+	boolean amIHost() {
+		return localHost;
 	}
 }

@@ -14,7 +14,6 @@ public class Server implements OuvidorProxy {
 	private Proxy proxy;
 	private Client user;
 	public Session connection;
-	public boolean localHost;
 
 	public Server() {
 		proxy = Proxy.getInstance();
@@ -27,8 +26,7 @@ public class Server implements OuvidorProxy {
 		System.out.println("connecting to localhost: " + user.getPlayer().getName());
 		try {
 			proxy.conectar("localhost", user.getPlayer().getName());
-			connection = new Session(this);
-			localHost = true;
+			connection = new Session(this, true);
 			connection.setRemotePlayer(new RemotePlayer("REMOTE", connection)); // FIXME: properly create remote player.
 
 			return connection;
@@ -44,8 +42,7 @@ public class Server implements OuvidorProxy {
 		try {
 			final String userName = user.getPlayer().getName();
 			proxy.conectar(ip, userName);
-			connection = new Session(this);
-			localHost = false;
+			connection = new Session(this, false);
 			// proxy.receberMensagem('J' + userName); create remotePlayer?
 			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
 
@@ -57,7 +54,7 @@ public class Server implements OuvidorProxy {
 	}
 
 	public void quitSession() {
-		if (localHost)
+		if (connection.amIHost())
 			proxy.tratarPerdaConexao();
 
 		connection = null;
@@ -111,7 +108,7 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void iniciarNovaPartida(Integer posicao) { // Who started the match shouldn't do anything here.
-		if (!localHost) {
+		if (!connection.amIHost()) {
 			user.match = connection.joinMatch(user.localPlayer);			
 			user.showMatch();
 		}
