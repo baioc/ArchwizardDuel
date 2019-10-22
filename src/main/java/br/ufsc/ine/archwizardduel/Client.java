@@ -202,8 +202,8 @@ public class Client extends JFrame {
 	}
 
 	/*
-		Update screen when you go back to the initial screen
-	*/
+	 * Update screen when you go back to the initial screen
+	 */
 	public void showBegin() {
 		connection = null;
 		match = null;
@@ -220,8 +220,8 @@ public class Client extends JFrame {
 	}
 
 	/*
-		Update screen when you join a session
-	*/
+	 * Update screen when you join a session
+	 */
 	public void showSession() {
 		match = null;
 		connectButton.setVisible(false);
@@ -237,8 +237,8 @@ public class Client extends JFrame {
 	}
 
 	/*
-		Update screen when you join a match
-	*/
+	 * Update screen when you join a match
+	 */
 	public void showMatch() {
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(false);

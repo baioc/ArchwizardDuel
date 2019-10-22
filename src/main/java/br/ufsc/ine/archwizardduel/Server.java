@@ -65,7 +65,7 @@ public class Server implements OuvidorProxy {
 
 		try {
 			proxy.desconectar();
-		} catch (NaoConectadoException ex) { ex.printStackTrace(); } // Should not be possible.
+		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
 		user = null;
 	}
 
@@ -122,11 +122,18 @@ public class Server implements OuvidorProxy {
 		// Should never happen.
 	}
 
+	private boolean sessionDisconnected() {
+		return proxy.obterNomeAdversarios().size() == 0;
+	}
+
 	@Override
 	public void finalizarPartidaComErro(String message) {
-		// Should only happen from proxy.finalizarPartida.
-		user.showMessage("Match finished!");
-		user.showSession();
+		if (sessionDisconnected()) {
+			tratarConexaoPerdida();
+		} else {
+			user.showMessage("Match finished!");
+			user.showSession();
+		}
 	}
 
 	@Override
