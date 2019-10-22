@@ -131,8 +131,9 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void finalizarPartidaComErro(String message) {
-		user.showMessage("Partida finalizada com erro!");
-		tratarConexaoPerdida();
+		// Should only happen from proxy.finalizarPartida.
+		user.showMessage("Partida finalizada!");
+		user.showSession();
 	}
 
 	@Override
