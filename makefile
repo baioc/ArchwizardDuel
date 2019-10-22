@@ -21,4 +21,5 @@ kill:
 	@killall java
 
 clean:
-	$(BUILDER) clean
+	$(MAKE) kill ; $(BUILDER) clean
+	@rm -f netgames.log

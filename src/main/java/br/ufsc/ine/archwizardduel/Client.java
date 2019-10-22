@@ -16,10 +16,9 @@ public class Client extends JFrame {
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
 	
-	public LocalPlayer localPlayer;
-	public Server server;
-	public Session connection;
-	public Arena match; // later, synchronize.
+	private LocalPlayer localPlayer;
+	private Server server;
+	private Session connection;
 	
 	private JButton connectButton;
 	private JButton disconnectButton;
@@ -123,11 +122,11 @@ public class Client extends JFrame {
 
 	// PUBLIC INTERFACE
 
-	public Player getPlayer() {
+	public LocalPlayer getPlayer() {
 		return localPlayer;
 	}
 
-	public String getTextArea() {
+	public String getCodeText() {
 		return typeHere.getText();
 	}
 
@@ -157,8 +156,8 @@ public class Client extends JFrame {
 			return;
 		}
 
-		if (server.connection.enoughParticipants()) {
-			match = connection.makeMatch(localPlayer);
+		if (connection.enoughParticipants()) {
+			connection.makeMatch(localPlayer);
 			showMatch();
 		} else {
 			showMessage("Not enough players!");
@@ -166,8 +165,7 @@ public class Client extends JFrame {
 	}
 
 	private void onPlayButton() {
-		if (match.myTurn()) {
-			match.nextTurn();	// @TODO: this order won't work if next line get's fixed.
+		if (connection.myTurn()) {
 			connection.sendCode(null); // @TODO: add player expression & test for invalid code.
 			showMessage("Code sent!");
 		}
@@ -206,7 +204,6 @@ public class Client extends JFrame {
 	 */
 	public void showBegin() {
 		connection = null;
-		match = null;
 		connectButton.setVisible(true);
 		disconnectButton.setVisible(false);
 		exitGame.setVisible(false);
@@ -223,7 +220,6 @@ public class Client extends JFrame {
 	 * Update screen when you join a session
 	 */
 	public void showSession() {
-		match = null;
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(true);
 		exitGame.setVisible(false);

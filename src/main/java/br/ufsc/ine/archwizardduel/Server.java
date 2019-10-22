@@ -13,7 +13,7 @@ public class Server implements OuvidorProxy {
 
 	private Proxy proxy;
 	private Client user;
-	public Session connection;
+	private Session connection;
 
 	public Server() {
 		proxy = Proxy.getInstance();
@@ -109,7 +109,7 @@ public class Server implements OuvidorProxy {
 	@Override
 	public void iniciarNovaPartida(Integer posicao) { // Who started the match shouldn't do anything here.
 		if (!connection.amIHost()) {
-			user.match = connection.joinMatch(user.localPlayer);			
+			connection.joinMatch(user.getPlayer());			
 			user.showMatch();
 		}
 	}
@@ -135,7 +135,6 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberJogada(Jogada jogada) { // mailbox.
-		user.match.nextTurn();
 		user.showMessage("Code received!");
 		connection.receiveCode((Expression) jogada);
 	}
