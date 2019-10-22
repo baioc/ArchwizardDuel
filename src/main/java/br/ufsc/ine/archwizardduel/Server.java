@@ -14,7 +14,7 @@ public class Server implements OuvidorProxy {
 	private Proxy proxy;
 	private Client user;
 	public Session connection;
-	private boolean localHost;
+	public boolean localHost;
 
 
 	public Server() {
@@ -116,12 +116,11 @@ public class Server implements OuvidorProxy {
 	}
 
 	@Override
-	public void iniciarNovaPartida(Integer posicao) { // only remote should end here.
-		try {
-			user.match = connection.joinMatch(user.localPlayer);	
-		} catch (NullPointerException FIXME) { FIXME.printStackTrace(); }
-		
-		user.showMatch();
+	public void iniciarNovaPartida(Integer posicao) { // Who started the match shouldn't do anything here.
+		if (!localHost) {
+			user.match = connection.joinMatch(user.localPlayer);			
+			user.showMatch();
+		}
 	}
 
 	@Override
@@ -138,6 +137,7 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberJogada(Jogada jogada) { // mailbox.
+		user.match.nextTurn();
 		user.showMessage("Jogada recebida!");
 		connection.receiveCode((Expression) jogada);
 	}

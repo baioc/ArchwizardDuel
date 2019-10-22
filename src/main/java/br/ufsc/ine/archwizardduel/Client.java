@@ -151,7 +151,12 @@ public class Client extends JFrame {
 		showSession();
 	}
 
-	private void onStartGame() { // what if they both try to start?
+	private void onStartGame() { // Only host can start a match.
+		if (!server.localHost) {
+			showMessage("Only the host can start a match!");
+			return;
+		}
+
 		if (server.connection.enoughParticipants()) {
 			match = connection.makeMatch(localPlayer);
 			showMatch();
@@ -161,8 +166,11 @@ public class Client extends JFrame {
 	}
 
 	private void onPlayButton() {
-		if (match.myTurn())
-			connection.sendCode(null); // @TODO: add local expression.
+		if (match.myTurn()) {
+			match.nextTurn();	// @TODO: this order won't work if next line get's fixed.
+			connection.sendCode(null); // @TODO: add player expression & test for invalid code.
+			showMessage("Jogada enviada!");
+		}
 	}
 
 	private void onHostButton() {
