@@ -15,12 +15,12 @@ public class Client extends JFrame {
 
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
-	private LocalPlayer localPlayer;
-	private RemotePlayer remotePlayer = null;
-	private Interpreter parser;
-	private Server server;
-	private Session link;
-	private Arena match;
+	
+	public LocalPlayer localPlayer;
+	public Server server;
+	public Session connection;
+	public Arena match; // later, synchronize.
+	
 	private JButton connectButton;
 	private JButton disconnectButton;
 	private JButton exitGame;
@@ -135,10 +135,6 @@ public class Client extends JFrame {
 		JOptionPane.showMessageDialog(this, msg, "Server update", JOptionPane.PLAIN_MESSAGE);
 	}
 
-	public void addRemotePlayer(RemotePlayer remotePlayer) {
-		this.remotePlayer = remotePlayer;
-	}
-
 	// PRIVATE INTERFACE
 
 	private void onConnectButton() {
@@ -147,37 +143,38 @@ public class Client extends JFrame {
 	}
 
 	private void onDisconnectButton() {
-		quitSession();
+		server.quitSession();
 	}
 
 	private void onExitGame() {
-		endMatch(remotePlayer);
+		endMatch(connection.getRemotePlayerName());
 	}
 
 	private void onStartGame() {
-		if (remotePlayer == null) {
-			server.tratarPartidaNaoIniciada("Not enought players!");
-		} else {
-			server.makeMatch();
+		if (connection.enoughParticipants()) {
+			match = connection.makeMatch(localPlayer);
 			showMatch();
+		} else {
+			connection.dropMatch();
 		}
 	}
 
 	private void onPlayButton() {
-		if (match.tu)
-		server.sendCode(null); // @TODO: add local expression.
+		if (match.myTurn())
+			connection.sendCode(null); // @TODO: add local expression.
 	}
 
 	private void onHostButton() {
-
+		if ((connection = server.makeSession(this)) != null) // failed to host session.
+			showSession();
 	}
 	
 	// Connected?
 	private boolean joinSession() {
-		while (link == null) {
+		while (connection == null) {
 			String ip = JOptionPane.showInputDialog(this, "Enter IP to join session", null);
 
-			if ((link = server.joinSession(this, ip)) != null)
+			if ((connection = server.joinSession(this, ip)) != null)
 				return true;
 
 			int n = JOptionPane.showConfirmDialog(
@@ -195,28 +192,19 @@ public class Client extends JFrame {
 		return true;
 	}
 
-	private void endMatch(Player winner) {
+	private void endMatch(String winner) {
 		JOptionPane.showMessageDialog(this,
-            "Congratulations " + winner.getName() +"! You did it!",
+            "Congratulations " + winner +"! You did it!",
             "End of match",
-            JOptionPane.PLAIN_MESSAGE);
-	}
-
-	private boolean onMakeSession() {
-		if (server.makeSession(this) == null) {
-			return false;
-		} return true;
-	}
-
-	private void quitSession() {
-		server.quitSession();
-		showBegin();
+			JOptionPane.PLAIN_MESSAGE);
+			match = null;
 	}
 
 	/*
 		Update screen when you go back to the initial screen
 	*/
-	private void showBegin() {
+	public void showBegin() {
+		connection = null;
 		connectButton.setVisible(true);
 		disconnectButton.setVisible(false);
 		exitGame.setVisible(false);
@@ -232,7 +220,7 @@ public class Client extends JFrame {
 	/*
 		Update screen when you join a session
 	*/
-	private void showSession() {
+	public void showSession() {
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(true);
 		exitGame.setVisible(false);
@@ -248,7 +236,7 @@ public class Client extends JFrame {
 	/*
 		Update screen when you join a match
 	*/
-	private void showMatch() {
+	public void showMatch() {
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(false);
 		exitGame.setVisible(true);

@@ -16,6 +16,10 @@ public class Server implements OuvidorProxy {
 	private Session connection;
 	private boolean localHost;
 
+	enum MessagePrefix {
+		JOIN,
+	}
+
 	public Server() {
 		proxy = Proxy.getInstance();
 		proxy.addOuvinte(this);
@@ -53,8 +57,9 @@ public class Server implements OuvidorProxy {
 			final String userName = user.getPlayer().getName();
 			localHost = false;
 			proxy.conectar(ip, userName);
-			proxy.receberMensagem("JOIN: " + userName);
+			proxy.receberMensagem(MessagePrefix.JOIN + userName);
 			connection = new Session(this);
+			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversario(0), connection));
 		} catch (JahConectadoException e) {
 			e.printStackTrace(); // Should not be possible.
 		} catch (NaoPossivelConectarException e) {
@@ -72,10 +77,10 @@ public class Server implements OuvidorProxy {
 	public void quitSession() {
 		if (localHost)
 			proxy.tratarPerdaConexao();
-		else
-			proxy.receberMensagem("QUIT: " + user.getPlayer().getName());
 
 		connection = null;
+		user.showBegin();
+
 		try {
 			proxy.desconectar();
 		} catch (NaoConectadoException e) {
@@ -138,12 +143,13 @@ public class Server implements OuvidorProxy {
 	}
 
 	@Override
-	public void iniciarNovaPartida(Integer posicao) {
-		user.showMessage("Partida inicializada!");
+	public void iniciarNovaPartida(Integer posicao) { // only remote should end here.
+		user.match = connection.makeMatch(user.localPlayer);
+		user.showMatch();
 	}
 
 	@Override
-	public void tratarPartidaNaoIniciada(String message) { // should never happen.
+	public void tratarPartidaNaoIniciada(String message) {
 		user.showMessage("Partida nao inicializada! Erro " + message);
 		tratarConexaoPerdida();
 	}
@@ -155,7 +161,8 @@ public class Server implements OuvidorProxy {
 	}
 
 	@Override
-	public void receberJogada(Jogada jogada) {
+	public void receberJogada(Jogada jogada) { // mailbox.
 		user.showMessage("Jogada recebida!");
+		connection.receiveCode((Expression) jogada);
 	}
 }
