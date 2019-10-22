@@ -16,9 +16,6 @@ public class Server implements OuvidorProxy {
 	private Session connection;
 	private boolean localHost;
 
-	enum MessagePrefix {
-		JOIN,
-	}
 
 	public Server() {
 		proxy = Proxy.getInstance();
@@ -57,7 +54,7 @@ public class Server implements OuvidorProxy {
 			final String userName = user.getPlayer().getName();
 			localHost = false;
 			proxy.conectar(ip, userName);
-			proxy.receberMensagem(MessagePrefix.JOIN + userName);
+			proxy.receberMensagem('J' + userName);
 			connection = new Session(this);
 			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversario(0), connection));
 		} catch (JahConectadoException e) {
@@ -113,19 +110,11 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberMensagem(String msg) {
-		if (msg.contains("JOIN: ")) {
-			final String userName = msg.substring(6);
-			if (!userName.equals(proxy.getNomeJogador())) {
-				user.showMessage(userName + " entrou na sessão.");
-				user.showMatch(true, true); // enable match begin with enough players
-			}
-
-		} else if (msg.contains("QUIT: ")) {
-			final String userName = msg.substring(6);
-			if (!userName.equals(proxy.getNomeJogador())) {
-				user.showMessage(userName + " saiu da sessão.");
-				// @TODO: disable match begin with not enough players
-			}
+		switch(msg.charAt(0)) {
+			case 'J':
+				connection.setRemotePlayer(new RemotePlayer(msg.substring(1), connection));
+			case 'Q':
+				break;
 		}
 	}
 
