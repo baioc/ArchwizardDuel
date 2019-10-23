@@ -116,8 +116,10 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void finalizarPartidaComErro(String message) {
+		System.out.println("\n\nLocalhost? " + connection.amIHost());
 		if (!bothPlayersUp()) {
-			quitMatch();
+			quitSession(); // other player dropped.
+			user.showBegin();
 		} else {
 			user.showMessage("Match finished!");
 			user.showSession();
