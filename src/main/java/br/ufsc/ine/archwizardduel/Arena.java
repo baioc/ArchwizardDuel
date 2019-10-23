@@ -1,23 +1,33 @@
 package br.ufsc.ine.archwizardduel;
 
+import java.util.List;
+import java.util.ArrayList;
+
 class Arena {
-    private Player[] participants = new Player[2];
-    private Wizard[] characters = new Wizard[2];
-    private final Interpreter executor = new Interpreter();
-    private int currentTurn;
 
-    Arena(Player[] participants, int goesFirst) {
-        this.participants = participants;
-        characters[0] = new Wizard(participants[0].getName());
-        characters[1] = new Wizard(participants[1].getName());
-        currentTurn = goesFirst;
-    }
+	private final Interpreter executor = new Interpreter();
+	private List<Player> players;
+	private List<Wizard> characters;
+	private int currentTurn;
 
-    public boolean myTurn() {
-        return currentTurn == 0; // localhost turn.
-    }
+	public Arena(List<Player> participants, int first) {
+		players = participants;
+		currentTurn = first;
+		characters = new ArrayList<>(participants.size());
+		for (Player p : participants)
+			characters.add(new Wizard(p.getName()));
+	}
 
-    public void nextTurn() {
-        currentTurn = (currentTurn + 1) % 2;
-    }
+	public Expression makePlay(String code) {
+		return executor.parse(code);
+	}
+
+	public boolean isLocalTurn() {
+		return currentTurn == 0;
+	}
+	// @FIXME: arena should be able to change turns by itself
+	public void nextTurn() {
+		currentTurn = (currentTurn + 1) % characters.size();
+	}
+
 }

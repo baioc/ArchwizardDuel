@@ -3,22 +3,19 @@ package br.ufsc.ine.archwizardduel;
 import java.util.Map;
 import java.util.HashMap;
 
-class Frame {
+class Frame { // @TODO
 
 	private Map<String,Value> symbolTable = new HashMap<>();
 
-	Value define(String var, Value val) {
-		// @TODO
+	public Value define(String var, Value val) {
 		return null;
 	}
 
-	boolean contains(String name) {
-		// @TODO
+	public boolean contains(String name) {
 		return false;
 	}
 
-	Value lookup(String symbol) {
-		// @TODO
+	public Value lookup(String symbol) {
 		return null;
 	}
 

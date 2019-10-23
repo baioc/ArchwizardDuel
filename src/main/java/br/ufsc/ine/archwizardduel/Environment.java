@@ -2,22 +2,23 @@ package br.ufsc.ine.archwizardduel;
 
 import java.util.List;
 
-class Environment {
+class Environment { // @TODO
 
 	private List<Frame> scopes;
 
-	Value define(String var, Value val) {
-		// @TODO
+	public Value define(String var, Value val) {
 		return null;
 	}
 
-	boolean contains(String name) {
-		// @TODO
+	public boolean contains(String name) {
 		return false;
 	}
 
-	Value lookup(String symbol) {
-		// @TODO
+	public Value lookup(String symbol) {
+		return null;
+	}
+
+	public Environment enclose(Frame scope) {
 		return null;
 	}
 

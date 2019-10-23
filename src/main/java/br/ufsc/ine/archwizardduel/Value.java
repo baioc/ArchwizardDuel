@@ -1,16 +1,18 @@
 package br.ufsc.ine.archwizardduel;
 
-class Value {
-    enum Type {
-        INTEGER,
-        CLOSURE,
-    }
+class Value { // @TODO
 
-    Type type;
-    Object datum;
+	enum Type {
+		INTEGER,
+		CLOSURE,
+	}
 
-    Value(Type type, Object datum) {
-        this.type = type;
-        this.datum = datum;
-    }
+	private Type type;
+	private Object datum;
+
+	public Value(Type type, Object datum) {
+		this.type = type;
+		this.datum = datum;
+	}
+
 }
