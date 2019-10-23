@@ -1,19 +1,23 @@
 package br.ufsc.ine.archwizardduel;
 
-import br.ufsc.inf.leobr.cliente.Jogada;
-import br.ufsc.inf.leobr.cliente.OuvidorProxy;
 import br.ufsc.inf.leobr.cliente.Proxy;
-import br.ufsc.inf.leobr.cliente.exception.ArquivoMultiplayerException;
+import br.ufsc.inf.leobr.cliente.OuvidorProxy;
 import br.ufsc.inf.leobr.cliente.exception.JahConectadoException;
+import br.ufsc.inf.leobr.cliente.exception.NaoPossivelConectarException;
+import br.ufsc.inf.leobr.cliente.exception.ArquivoMultiplayerException;
 import br.ufsc.inf.leobr.cliente.exception.NaoConectadoException;
 import br.ufsc.inf.leobr.cliente.exception.NaoJogandoException;
-import br.ufsc.inf.leobr.cliente.exception.NaoPossivelConectarException;
+import br.ufsc.inf.leobr.cliente.Jogada;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Server implements OuvidorProxy {
 
 	private Proxy proxy;
 	private Client user;
 	private Session connection;
+	private boolean hasQuit;
+	private String ip;
 
 	public Server() {
 		proxy = Proxy.getInstance();
@@ -21,114 +25,126 @@ public class Server implements OuvidorProxy {
 		connection = null;
 	}
 
-	public boolean bothPlayersUp() {
-		return proxy.obterNomeAdversarios().size() == 1;
-	}
+
+	/*************************** CLIENT INTERFACE *****************************/
 
 	public Session makeSession(Client host) {
-		user = host;
-		System.out.println("connecting to localhost: " + user.getPlayer().getName());
-		try {
-			proxy.conectar("localhost", user.getPlayer().getName());
-			connection = new Session(this, true);
-			connection.setRemotePlayer(new RemotePlayer("REMOTE", connection)); // FIXME: properly create remote player.
-
-			return connection;
-		} catch (JahConectadoException | NaoPossivelConectarException | ArquivoMultiplayerException ex) {
-			ex.printStackTrace();
-			return null;
-		}
+		return connect(host, "localhost", true);
 	}
 
 	public Session joinSession(Client client, String ip) {
-		user = client;
-		System.out.println("connecting to" + ip + ": "+ user.getPlayer().getName());
-		try {
-			final String userName = user.getPlayer().getName();
-			proxy.conectar(ip, userName);
-			connection = new Session(this, false);
-			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
+		return connect(client, ip, false);
+	}
 
-			return connection;
-		} catch (JahConectadoException |ArquivoMultiplayerException | NaoPossivelConectarException ex) {
+	private Session connect(Client user, String ip, boolean localHost) {
+		try {
+			proxy.conectar(ip, user.getPlayer().getName());
+			this.user = user;
+			this.ip = ip;
+			hasQuit = false;
+			connection = new Session(this, localHost);
+		} catch (JahConectadoException ex) {
 			ex.printStackTrace();
-			return null;
+		} catch (NaoPossivelConectarException | ArquivoMultiplayerException ex) {
+			user.showMessage("Could not connect to " + ip + ":\n" + ex.getMessage());
+		} finally {
+			return connection;
 		}
 	}
 
-	public void quitSession() {
-		user.showMessage("Disconnected!");
-
+	public void leaveSession() {
 		try {
 			proxy.desconectar();
-		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
-		
+		} catch (NaoConectadoException ex) {
+			ex.printStackTrace();
+		}
 		connection = null;
-		user.showBegin();
-		user = null;
 	}
 
-	public void makeMatch() {
-		try {
+
+	/************************** SESSION INTERFACE *****************************/
+
+	public void beginMatch() {
+		try{
 			proxy.iniciarPartida(2);
-		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
-		connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
+		} catch (NaoConectadoException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public void quitMatch() {
+		hasQuit = true;
 		try {
 			proxy.finalizarPartida();
-		} catch (NaoConectadoException | NaoJogandoException ex) { ex.printStackTrace(); }
-	}
-
-	public void sendCode(Expression code) {
-		try {
-			proxy.enviaJogada((Jogada) code);
-		} catch (NaoJogandoException ex) { ex.printStackTrace(); }
-	}
-
-	/**************************************************************************/
-	/**************************** Ouvidor Proxy *******************************/
-	/**************************************************************************/
-
-	@Override
-	public void receberMensagem(String msg) {
-		// Unused.
-	}
-
-	@Override
-	public void tratarConexaoPerdida() {
-		// Unused.
-	}
-
-	@Override
-	public void iniciarNovaPartida(Integer posicao) { // Who started the match shouldn't do anything here.
-		if (!connection.amIHost()) {
-			connection.joinMatch(user.getPlayer());			
-			user.showMatch();
+		} catch (NaoConectadoException | NaoJogandoException ex) {
+			ex.printStackTrace();
 		}
 	}
 
+	public void send(Expression code) {
+		try {
+			proxy.enviaJogada((Jogada) code);
+		} catch (NaoJogandoException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public List<Player> getPlayers() {
+		final List<String> remotes = proxy.obterNomeAdversarios();
+
+		if (remotes.size() < 1)
+			return null;
+
+		ArrayList<Player> participants = new ArrayList<>(remotes.size() + 1);
+		participants.add(user.getPlayer());
+		for (String name : remotes)
+			participants.add(new Player(name));
+
+		return participants;
+	}
+
+
+	/**************************** Ouvidor Proxy *******************************/
+
 	@Override
-	public void tratarPartidaNaoIniciada(String message) {
-		// Should never happen.
+	public void iniciarNovaPartida(Integer posicao) {
+		if (connection.makeMatch())
+			user.showMatch();
+	}
+
+	@Override
+	public void receberJogada(Jogada jogada) {
+		final Expression expr = (Expression) jogada;
+		user.showMessage("Received:\n" + expr.toString());
+		connection.pull(expr);
 	}
 
 	@Override
 	public void finalizarPartidaComErro(String message) {
-		System.out.println("\n\nLocalhost? " + connection.amIHost());
-		if (!bothPlayersUp()) {
-			quitSession(); // other player dropped.
-			user.showBegin();
-		} else {
-			user.showMessage("Match finished!");
+		if (hasQuit) {
+			hasQuit = false;
+			return;
+		}
+
+		if (connection.isLocallyHosted()) {
+			user.showMessage("Remote connection error:\n" + message);
 			user.showSession();
+		} else {
+			user.showMessage("Host connection error:\n" + message);
+			user.showBegin();
+			leaveSession();
 		}
 	}
 
 	@Override
-	public void receberJogada(Jogada jogada) { // mailbox.
-		user.showMessage("Code received!");
-		connection.receiveCode((Expression) jogada);
+	public void tratarConexaoPerdida() {
+		finalizarPartidaComErro("Lost connection.");
 	}
+
+	@Override
+	public void receberMensagem(String msg) {}
+
+	@Override
+	public void tratarPartidaNaoIniciada(String message) {}
+
 }

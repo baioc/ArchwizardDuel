@@ -10,7 +10,7 @@ buildNumber.properties
 .mvn/timing.properties
 
 # NetGamesNRT
-lib/*.properties
+*/jogoMultiPlayer.properties
 
 # Visual Paradigm
 *.vpp.bak*

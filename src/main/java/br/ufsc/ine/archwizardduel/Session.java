@@ -1,59 +1,72 @@
 package br.ufsc.ine.archwizardduel;
 
+import java.util.List;
+import java.util.ArrayList;
+
 class Session {
 
 	private final Server server;
 	private final boolean localHost;
-	private RemotePlayer remotePlayer = null;
-	private Arena match = null;
+	private Player localPlayer;
+	private Player remotePlayer;
+	private Arena match;
 
-	Session(Server server, boolean localHost) {
+
+	/************************** SERVER INTERFACE ******************************/
+
+	public Session(Server server, boolean localHost) {
 		this.server = server;
 		this.localHost = localHost;
+		localPlayer = null;
+		remotePlayer = null;
+		match = null;
 	}
 
-	void makeMatch(LocalPlayer localPlayer) {
-		server.makeMatch();
-		match = new Arena(new Player[]{localPlayer, remotePlayer}, 0);
-	}
-
-	void joinMatch(LocalPlayer localPlayer) {
-		match = new Arena(new Player[]{localPlayer, remotePlayer}, 1);
-	}
-
-	// give-up match.
-	void quitMatch() {
-		server.quitMatch();
-	}
-
-	// send through proxy.
-	void sendCode(Expression code) {
-		match.nextTurn();
-		server.sendCode(code);
-	}
-
-	// mailbox.
-	void receiveCode(Expression code) {
-		match.nextTurn();
-		remotePlayer.receiveMail(code); // player not yet involved.
-		remotePlayer.notifyAll();
-	}
-	
-	boolean amIHost() {
+	public boolean isLocallyHosted() {
 		return localHost;
 	}
 
-	boolean myTurn() {
-		return match.myTurn();
+	public boolean makeMatch() {
+		final List<Player> participants = server.getPlayers();
+		if (participants != null) {
+			localPlayer = participants.get(0);
+			remotePlayer = participants.get(1);
+			match = new Arena(participants, localHost ? 0 : 1);
+			return true;
+		}
+		return false;
 	}
 
-	// REMOTE PLAYER INTERFACE.
-
-	String getRemotePlayerName() {
-		return remotePlayer.getName();
+	public void pull(Expression code) {
+		remotePlayer.setNextPlay(code);
+		match.nextTurn();
 	}
 
-	void setRemotePlayer(RemotePlayer remotePlayer) {
-		this.remotePlayer = remotePlayer;
+
+	/*************************** CLIENT INTERFACE *****************************/
+
+	public boolean startMatch() {
+		if (localHost && makeMatch()) {
+			server.beginMatch();
+			return true;
+		}
+		return false;
 	}
+
+	public void quitMatch() {
+		server.quitMatch();
+		localPlayer = null;
+		remotePlayer = null;
+		match = null;
+	}
+
+	public void push(String code) {
+		if (match.isLocalTurn()) {
+			final Expression play = match.makePlay(code);
+			server.send(play);
+			localPlayer.setNextPlay(play);
+			match.nextTurn();
+		}
+	}
+
 }

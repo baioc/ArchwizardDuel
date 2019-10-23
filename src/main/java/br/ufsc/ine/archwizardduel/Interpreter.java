@@ -1,21 +1,13 @@
 package br.ufsc.ine.archwizardduel;
 
-class Interpreter {
+class Interpreter { // @TODO
 
 	private Environment globals;
 
-	Interpreter() {
-		// @TODO
-		// this.globals = globals;
+	public Expression parse(String code) {
+		return new Expression(code); // @XXX: testing
 	}
 
-	Expression parse(String code) {
-		// @TODO
-		return null;
-	}
-
-	void interpret(Expression expr) {
-		// @TODO
-	}
+	public void interpret(Expression expr) {}
 
 }
