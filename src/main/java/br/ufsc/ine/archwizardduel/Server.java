@@ -47,7 +47,6 @@ public class Server implements OuvidorProxy {
 			final String userName = user.getPlayer().getName();
 			proxy.conectar(ip, userName);
 			connection = new Session(this, false);
-			// proxy.receberMensagem('J' + userName); create remotePlayer?
 			connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
 
 			return connection;
@@ -73,6 +72,7 @@ public class Server implements OuvidorProxy {
 		try {
 			proxy.iniciarPartida(2);
 		} catch (NaoConectadoException ex) { ex.printStackTrace(); }
+		connection.setRemotePlayer(new RemotePlayer(proxy.obterNomeAdversarios().get(0), connection));
 	}
 
 	public void quitMatch() {
