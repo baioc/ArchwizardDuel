@@ -40,6 +40,10 @@ public class Server implements OuvidorProxy {
 		try {
 			proxy.conectar(ip, user.getPlayer().getName());
 			this.user = user;
+			if (localHost && (getPlayers() != null)) {
+				leaveSession();
+				return null;
+			}
 			this.ip = ip;
 			hasQuit = false;
 			connection = new Session(this, localHost);
