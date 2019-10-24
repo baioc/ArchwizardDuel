@@ -88,6 +88,7 @@ public class Server implements OuvidorProxy {
 	public void send(Expression code) {
 		try {
 			proxy.enviaJogada((Jogada) code);
+			user.showMessage("Sent!");
 		} catch (NaoJogandoException ex) {
 			ex.printStackTrace();
 		}
