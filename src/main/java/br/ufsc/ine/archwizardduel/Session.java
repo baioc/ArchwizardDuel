@@ -31,7 +31,7 @@ class Session {
 		if (participants != null) {
 			localPlayer = participants.get(0);
 			remotePlayer = participants.get(1);
-			match = new Arena(participants, localHost ? 0 : 1);
+			match = new Arena(participants, localHost ? 0 : 1); // @TODO: arena on a separate Thread?
 			return true;
 		}
 		return false;
@@ -62,7 +62,7 @@ class Session {
 
 	public void push(String code) {
 		if (match.isLocalTurn()) {
-			final Expression play = match.makePlay(code);
+			final Expression play = match.makePlay(code); // @TODO: test valid code?
 			server.send(play);
 			localPlayer.setNextPlay(play);
 			match.nextTurn();

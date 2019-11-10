@@ -29,7 +29,7 @@ public class Server implements OuvidorProxy {
 	/*************************** CLIENT INTERFACE *****************************/
 
 	public Session makeSession(Client host) {
-		return connect(host, "localhost", true);
+		return connect(host, "localhost", true); // @FIXME: host session on variable IP
 	}
 
 	public Session joinSession(Client client, String ip) {
@@ -86,6 +86,7 @@ public class Server implements OuvidorProxy {
 	}
 
 	public void send(Expression code) {
+		// @TODO: test valid code?
 		try {
 			proxy.enviaJogada((Jogada) code);
 			user.showMessage("Sent!");
