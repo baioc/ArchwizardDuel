@@ -9,9 +9,6 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
-# NetGamesNRT
-*jogoMultiPlayer.properties
-
 # Visual Paradigm
 *.vpp.bak*
 
