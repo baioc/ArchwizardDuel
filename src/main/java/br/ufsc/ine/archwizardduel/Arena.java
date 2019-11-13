@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 class Arena {
 
-	private final Interpreter executor = new Interpreter();
+	private final Interpreter executor = null; // @TODO: evaluator initialization
 	private List<Player> players;
 	private List<Wizard> characters;
 	private int currentTurn;
@@ -19,7 +19,7 @@ class Arena {
 	}
 
 	public Expression makePlay(String code) {
-		return executor.parse(code);
+		return new Expression(code);
 	}
 
 	public boolean isLocalTurn() {

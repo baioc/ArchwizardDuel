@@ -1,8 +1,9 @@
 package br.ufsc.ine.archwizardduel;
 
 import java.util.List;
+import java.util.function.Function;
 
-public class Procedure {
+public class Procedure implements Function<List<Value>,Value> {
 
 	private final List<String> parameters;
 	private final Expression body;

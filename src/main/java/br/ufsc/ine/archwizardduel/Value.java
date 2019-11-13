@@ -1,5 +1,9 @@
 package br.ufsc.ine.archwizardduel;
 
+import java.math.BigDecimal;
+import java.util.function.Function;
+import java.util.List;
+
 class Value {
 
 	public enum Type {
@@ -15,6 +19,22 @@ class Value {
 	public Value(Type type, Object datum) {
 		this.type = type;
 		this.datum = datum;
+	}
+
+	public Value() {
+		this(Type.VOID, null);
+	}
+
+	public Value(Function<List<Value>,Value> closure) {
+		this(Type.CLOSURE, closure);
+	}
+
+	public Value(BigDecimal number) {
+		this(Type.NUMBER, number);
+	}
+
+	public Value(Boolean bool) {
+		this(Type.BOOLEAN, bool);
 	}
 
 	public Type getType() {

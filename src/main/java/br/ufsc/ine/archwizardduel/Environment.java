@@ -5,7 +5,12 @@ import java.util.LinkedList;
 
 class Environment {
 
-	private List<Frame> scopes = new LinkedList<>();
+	private List<Frame> scopes;
+
+	public Environment(Frame primitives) {
+		scopes = new LinkedList<>();
+		scopes.add(primitives);
+	}
 
 	public Value define(String var, Value val) {
 		return scopes.get(0).define(var, val);
@@ -28,9 +33,8 @@ class Environment {
 	}
 
 	public Environment enclose(Frame scope) {
-		Environment inner = new Environment();
+		Environment inner = new Environment(scope);
 		inner.scopes.addAll(this.scopes);
-		inner.scopes.add(0, scope);
 		return inner;
 	}
 
