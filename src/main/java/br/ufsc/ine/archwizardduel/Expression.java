@@ -3,7 +3,8 @@ package br.ufsc.ine.archwizardduel;
 import br.ufsc.ine.archwizardduel.Value.Type;
 import br.ufsc.inf.leobr.cliente.Jogada;
 import java.util.List;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.math.BigDecimal;
 import java.util.function.Function;
 
@@ -21,6 +22,10 @@ class Expression implements Jogada {
 	public Expression(List<Expression> subexpressions) {
 		this.subexpressions = subexpressions;
 		atom = null;
+	}
+
+	public Expression(Expression... subexpressions) {
+		this(Arrays.asList(subexpressions));
 	}
 
 	@Override
@@ -43,12 +48,12 @@ class Expression implements Jogada {
 			// numbers are self-evaluating
 			try {
 				BigDecimal number = new BigDecimal(atom);
-				return new Value(Type.NUMBER, number);
+				return new Value(number);
 			} catch (NumberFormatException _) {}
 
 			// booleans are self-evaluating
 			if (atom.equals("true") || atom.equals("false"))
-				return new Value(Type.BOOLEAN, new Boolean(atom));
+				return new Value(new Boolean(atom));
 
 			// symbols are looked up in the environment
 			return env.lookup(atom); // @TODO: what if not found?
@@ -78,19 +83,24 @@ class Expression implements Jogada {
 						return subexpressions.get(2).evaluate(env);    // consequence
 
 				case "lambda":
-					LinkedList<String> parameters = new LinkedList<>();
+					List<String> parameters = new ArrayList<>();
 					for (Expression param : subexpressions.get(1).subexpressions)
 						parameters.add(param.atom);
-					List<Expression> body = subexpressions.subList(2, subexpressions.size());
-					body.add(0, new Expression("begin"));
-					return new Value(Type.CLOSURE, new Procedure(parameters, new Expression(body), env));
+
+					List<Expression> body = new ArrayList<>();
+					body.add(new Expression("begin"));
+					for (int i = 2; i < subexpressions.size(); ++i)
+						body.add(subexpressions.get(i));
+
+					return new Value(new Procedure(parameters, new Expression(body), env));
 
 				// otherwise, apply a procedure
 				default:
-					final Function<List<Value>,Value> proc = (Function<List<Value>,Value>) subexpressions.get(0).evaluate(env).getDatum();
-					List<Value> arguments = new LinkedList<>();
+					List<Value> arguments = new ArrayList<>();
 					for (int arg = 1; arg < subexpressions.size(); ++arg)
 						arguments.add(subexpressions.get(arg).evaluate(env));
+
+					final Function<List<Value>,Value> proc = (Function<List<Value>,Value>) subexpressions.get(0).evaluate(env).getDatum();
 					return proc.apply(arguments);
 			}
 		}

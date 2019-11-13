@@ -14,44 +14,61 @@ public class LispTest {
 	public void testLisp() {
 		Frame primitives = new Frame();
 
-		primitives.define("+", new Value((List<Value> arglist) -> {
-			BigDecimal a = (BigDecimal) arglist.get(0).getDatum();
-			BigDecimal b = (BigDecimal) arglist.get(1).getDatum();
+		primitives.define("+", new Value(args -> {
+			BigDecimal a = (BigDecimal) args.get(0).getDatum();
+			BigDecimal b = (BigDecimal) args.get(1).getDatum();
 			return new Value(a.add(b));
 		}));
 
-		primitives.define("-", new Value((List<Value> arglist) -> {
-			BigDecimal a = (BigDecimal) arglist.get(0).getDatum();
-			BigDecimal b = (BigDecimal) arglist.get(1).getDatum();
+		primitives.define("-", new Value(args -> {
+			BigDecimal a = (BigDecimal) args.get(0).getDatum();
+			BigDecimal b = (BigDecimal) args.get(1).getDatum();
 			return new Value(a.subtract(b));
 		}));
 
 		Environment environment = new Environment(primitives);
 		Expression expr = new Expression(
-			new ArrayList<>(Arrays.asList(
-				new Expression("if"),
-				new Expression("false"),
-				new Expression("1"),
-				new Expression("0")
-				// new Expression(
-				// 	new ArrayList<>(Arrays.asList(
-				// 		new Expression("+"),
-				// 		new Expression("1"),
-				// 		new Expression("2")
-				// 	))
-				// ),
-				// new Expression(
-				// 	new ArrayList<>(Arrays.asList(
-				// 		new Expression("-"),
-				// 		new Expression("2"),
-				// 		new Expression("1")
-				// 	))
-				// )
-			))
+			new Expression("begin"),
+
+			new Expression(
+				new Expression("define"),
+				new Expression("foo"),
+				new Expression(
+					new Expression("lambda"),
+					new Expression(
+						new Expression("pred")
+					),
+					new Expression(
+						new Expression("if"),
+						new Expression("pred"),
+						new Expression(
+							new Expression("+"),
+							new Expression("1"),
+							new Expression("2")
+						),
+						new Expression(
+							new Expression("-"),
+							new Expression("1"),
+							new Expression("2")
+						)
+					)
+				)
+			),
+
+			new Expression(
+				new Expression("define"),
+				new Expression("bar"),
+				new Expression("false")
+			),
+
+			new Expression(
+				new Expression("foo"),
+				new Expression("bar")
+			)
 		);
+
 		System.out.println(expr.toString());
-		Value result = expr.evaluate(environment);
-		System.out.println(result.getDatum().toString());
+		System.out.println(expr.evaluate(environment).getDatum().toString());
 	}
 
 }
