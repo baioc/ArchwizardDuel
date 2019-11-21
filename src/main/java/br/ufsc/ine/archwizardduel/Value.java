@@ -1,6 +1,5 @@
 package br.ufsc.ine.archwizardduel;
 
-import java.math.BigDecimal;
 import java.util.function.Function;
 import java.util.List;
 
@@ -21,32 +20,26 @@ class Value {
 		this.datum = datum;
 	}
 
-	public Value() {
-		this(Type.VOID, null);
+	public Value(Function<List<Value>,Value> procedure) {
+		this.type = Type.CLOSURE;
+		this.datum = procedure;
 	}
 
-	public Value(Function<List<Value>,Value> closure) {
-		this(Type.CLOSURE, closure);
-	}
-
-	public Value(BigDecimal number) {
-		this(Type.NUMBER, number);
-	}
-
-	public Value(Boolean bool) {
-		this(Type.BOOLEAN, bool);
-	}
-
-	public Type getType() {
+	public Type type() {
 		return type;
 	}
 
-	public Object getDatum() {
+	public Object get() {
 		return datum;
 	}
 
 	public boolean isFalse() {
 		return type == Type.BOOLEAN && ((Boolean) datum).booleanValue() == false;
+	}
+
+	@Override
+	public String toString() {
+		return datum.toString();
 	}
 
 }

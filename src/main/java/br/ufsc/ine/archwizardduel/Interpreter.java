@@ -9,7 +9,7 @@ class Interpreter { // @TODO
 	}
 
 	public Expression parse(String code) {
-		return new Expression(code); // @XXX: testing
+		return new VariableExpression(code); // @XXX: testing
 	}
 
 	public void interpret(Expression expr) {

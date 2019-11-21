@@ -19,7 +19,7 @@ class Arena {
 	}
 
 	public Expression makePlay(String code) {
-		return new Expression(code);
+		return new VariableExpression(code); // @XXX: testing
 	}
 
 	public boolean isLocalTurn() {

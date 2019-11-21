@@ -4,71 +4,60 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import br.ufsc.ine.archwizardduel.Value.Type;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Function;
+import java.util.List;
 
 public class LispTest {
 
 	@Test
 	public void testLisp() {
 		Frame primitives = new Frame();
-
+		primitives.define("false", new Value(Type.BOOLEAN, new Boolean(false)));
+		primitives.define("true", new Value(Type.BOOLEAN, new Boolean(true)));
 		primitives.define("+", new Value(args -> {
-			BigDecimal a = (BigDecimal) args.get(0).getDatum();
-			BigDecimal b = (BigDecimal) args.get(1).getDatum();
-			return new Value(a.add(b));
+			BigDecimal a = (BigDecimal) args.get(0).get();
+			BigDecimal b = (BigDecimal) args.get(1).get();
+			return new Value(Type.NUMBER, a.add(b));
 		}));
-
 		primitives.define("-", new Value(args -> {
-			BigDecimal a = (BigDecimal) args.get(0).getDatum();
-			BigDecimal b = (BigDecimal) args.get(1).getDatum();
-			return new Value(a.subtract(b));
+			BigDecimal a = (BigDecimal) args.get(0).get();
+			BigDecimal b = (BigDecimal) args.get(1).get();
+			return new Value(Type.NUMBER, a.subtract(b));
 		}));
-
 		Environment environment = new Environment(primitives);
-		Expression expr = new Expression(
-			new Expression("begin"),
 
-			new Expression(
-				new Expression("define"),
-				new Expression("foo"),
-				new Expression(
-					new Expression("lambda"),
-					new Expression(
-						new Expression("pred")
+		Expression expr = new SequentialExpression(Arrays.asList(
+			new DefinitionExpression("foo",
+				new LambdaExpression(
+					Arrays.asList(
+						"pred"
 					),
-					new Expression(
-						new Expression("if"),
-						new Expression("pred"),
-						new Expression(
-							new Expression("+"),
-							new Expression("1"),
-							new Expression("2")
-						),
-						new Expression(
-							new Expression("-"),
-							new Expression("1"),
-							new Expression("2")
+					new ConditionalExpression(
+						new VariableExpression("pred"),
+						new ApplicationExpression(
+							new VariableExpression("-"),
+							Arrays.asList(
+								new NumericExpression(new BigDecimal("1")),
+								new NumericExpression(new BigDecimal("2"))
+							)
 						)
 					)
 				)
 			),
-
-			new Expression(
-				new Expression("define"),
-				new Expression("bar"),
-				new Expression("false")
+			new DefinitionExpression("bar",
+				new VariableExpression("true")
 			),
-
-			new Expression(
-				new Expression("foo"),
-				new Expression("bar")
+			new ApplicationExpression(
+				new VariableExpression("foo"),
+				Arrays.asList(
+					new VariableExpression("bar")
+				)
 			)
-		);
+		));
 
 		System.out.println(expr.toString());
-		System.out.println(expr.evaluate(environment).getDatum().toString());
+		System.out.println(expr.evaluate(environment).toString());
 	}
 
 }

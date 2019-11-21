@@ -1,7 +1,8 @@
 package br.ufsc.ine.archwizardduel;
 
-import java.util.List;
 import java.util.function.Function;
+import java.util.List;
+import java.lang.IllegalArgumentException;
 
 public class Procedure implements Function<List<Value>,Value> {
 
@@ -15,12 +16,21 @@ public class Procedure implements Function<List<Value>,Value> {
 		this.definitionEnvironment = env;
 	}
 
-	public Value apply(List<Value> arguments) {
-		// @TODO: check whether arguments match procedure arity
+	@Override
+	public Value apply(List<Value> arguments) throws IllegalArgumentException {
+		if (arguments.size() != parameters.size()) {
+			throw new IllegalArgumentException(
+				"Could not match formal parameter list in apply " +
+				parameters.toString() + " ."
+			);
+		}
+
 		Frame substitutions = new Frame();
 		for (int i = 0; i < parameters.size(); ++i)
 			substitutions.define(parameters.get(i), arguments.get(i));
-		return body.evaluate(definitionEnvironment.enclose(substitutions));
+
+		Environment extended = definitionEnvironment.enclose(substitutions);
+		return body.evaluate(extended);
 	}
 
 }

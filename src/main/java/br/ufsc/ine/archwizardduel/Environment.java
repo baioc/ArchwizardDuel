@@ -2,6 +2,7 @@ package br.ufsc.ine.archwizardduel;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.lang.IllegalArgumentException;
 
 class Environment {
 
@@ -24,12 +25,12 @@ class Environment {
 		return false;
 	}
 
-	public Value lookup(String symbol) {
+	public Value lookup(String symbol) throws IllegalArgumentException {
 		for (Frame frame : scopes) {
 			if (frame.contains(symbol))
 				return frame.lookup(symbol);
 		}
-		return null; // @TODO: lookup undefined variable?
+		throw new IllegalArgumentException("Undefined variable " + symbol + ".");
 	}
 
 	public Environment enclose(Frame scope) {
