@@ -3,7 +3,7 @@ package br.ufsc.ine.archwizardduel;
 import br.ufsc.ine.archwizardduel.Value.Type;
 import java.util.List;
 
-class LambdaExpression extends Expression {
+class LambdaExpression implements Expression {
 
 	private final List<String> parameters;
 	private final Expression body;

@@ -1,6 +1,6 @@
 package br.ufsc.ine.archwizardduel;
 
-class VariableExpression extends Expression {
+class VariableExpression implements Expression {
 
 	private final String name;
 

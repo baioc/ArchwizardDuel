@@ -2,7 +2,7 @@ package br.ufsc.ine.archwizardduel;
 
 import java.util.List;
 
-class SequentialExpression extends Expression {
+class SequentialExpression implements Expression {
 
 	private final List<Expression> sequence;
 

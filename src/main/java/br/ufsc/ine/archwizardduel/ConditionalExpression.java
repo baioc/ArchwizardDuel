@@ -1,6 +1,6 @@
 package br.ufsc.ine.archwizardduel;
 
-class ConditionalExpression extends Expression {
+class ConditionalExpression implements Expression {
 
 	private final Expression condition;
 	private final Expression consequence;

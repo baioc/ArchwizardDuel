@@ -2,7 +2,7 @@ package br.ufsc.ine.archwizardduel;
 
 import br.ufsc.ine.archwizardduel.Value.Type;
 
-class DefinitionExpression extends Expression {
+class DefinitionExpression implements Expression {
 
 	private final String definiendum;
 	private final Expression definition;

@@ -27,6 +27,12 @@ public class LispTest {
 		}));
 		Environment environment = new Environment(primitives);
 
+		/* The following expression is equivalent to:
+		(begin
+		  (define foo (lambda (pred)
+		    (if pred (- 1 2) false)))
+		  (define bar true)
+		  (foo bar))*/
 		Expression expr = new SequentialExpression(Arrays.asList(
 			new DefinitionExpression("foo",
 				new LambdaExpression(

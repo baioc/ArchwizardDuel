@@ -2,8 +2,8 @@ package br.ufsc.ine.archwizardduel;
 
 import br.ufsc.inf.leobr.cliente.Jogada;
 
-public abstract class Expression implements Jogada {
+public interface Expression extends Jogada {
 
-	public abstract Value evaluate(Environment env) ;
+	public Value evaluate(Environment env);
 
 }

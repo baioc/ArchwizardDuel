@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-public class ApplicationExpression extends Expression {
+public class ApplicationExpression implements Expression {
 
 	private final Expression operator;
 	private final List<Expression> operands;

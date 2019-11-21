@@ -3,7 +3,7 @@ package br.ufsc.ine.archwizardduel;
 import br.ufsc.ine.archwizardduel.Value.Type;
 import java.math.BigDecimal;
 
-class NumericExpression extends Expression {
+class NumericExpression implements Expression {
 
 	private final Value number;
 
