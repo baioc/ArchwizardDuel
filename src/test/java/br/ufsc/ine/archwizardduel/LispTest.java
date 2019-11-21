@@ -11,6 +11,17 @@ import java.util.List;
 public class LispTest {
 
 	@Test
+	public void testParse() {
+		String code = "(begin\n" +
+		              "  (define  foo (lambda (   pred ) ; \n" +
+		              "      (if pred; testing comments \n" +
+		              "          (- 1 2)(+ 1 2))))\n" +
+		              "  (define bar true)\n" +
+		              "  (foo bar))";
+		System.out.println(Interpreter.tokenize(code).toString());
+	}
+
+	@Test
 	public void testLisp() {
 		Frame primitives = new Frame();
 		primitives.define("false", new Value(Type.BOOLEAN, new Boolean(false)));
