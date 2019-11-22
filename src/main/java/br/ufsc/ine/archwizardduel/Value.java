@@ -20,6 +20,7 @@ class Value {
 		this.datum = datum;
 	}
 
+	// @NOTE: this constructor provides lambda syntax sugar closure Values
 	public Value(Function<List<Value>,Value> procedure) {
 		this.type = Type.CLOSURE;
 		this.datum = procedure;
