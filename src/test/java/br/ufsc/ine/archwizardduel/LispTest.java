@@ -25,49 +25,16 @@ public class LispTest {
 		}));
 		Environment environment = new Environment(primitives);
 
-		Expression expr = new SequentialExpression(Arrays.asList(
-			new DefinitionExpression("foo",
-				new LambdaExpression(
-					Arrays.asList(
-						"pred"
-					),
-					new ConditionalExpression(
-						new VariableExpression("pred"),
-						new ApplicationExpression(
-							new VariableExpression("-"),
-							Arrays.asList(
-								new NumericExpression(new BigDecimal("1")),
-								new NumericExpression(new BigDecimal("2"))
-							)
-						)
-					)
-				)
-			),
-			new DefinitionExpression("bar",
-				new VariableExpression("true")
-			),
-			new ApplicationExpression(
-				new VariableExpression("foo"),
-				Arrays.asList(
-					new VariableExpression("bar")
-				)
-			)
-		));
-
-		System.out.println(expr.toString());
-		System.out.println(expr.evaluate(environment).toString());
-	}
-
-	@Test
-	public void testLexer() {
 		String code = "(begin\n" +
 		              "  (define  foo (lambda (   pred ) ; \n" +
 		              "      (if pred; testing comments \n" +
-		              "          (- 1 2)(+ 1 2))))\n" +
-		              "  (define bar true)\n" +
+		              "          (+ 1 2)(- 1 2))))\n" +
+		              "  (define bar false)\n" +
 		              "  (foo bar))";
 
-		System.out.println(Interpreter.tokenize(code).toString());
+		Expression compiled = Interpreter.buildExpression(Interpreter.tokenize(code));
+		System.out.println(compiled.toString());
+		System.out.println(compiled.evaluate(environment).toString());
 	}
 
 }

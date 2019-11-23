@@ -16,11 +16,6 @@ class ConditionalExpression implements Expression {
 		this.alternative = alternative;
 	}
 
-	public ConditionalExpression(Expression condition, Expression consequence) {
-		// sets a default alternative to allow for ifs with consequence only
-		this(condition, consequence, new VariableExpression("false"));
-	}
-
 	@Override
 	public Value evaluate(Environment env) {
 		if (condition.evaluate(env).isFalse())

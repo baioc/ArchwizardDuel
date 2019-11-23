@@ -1,6 +1,8 @@
 package br.ufsc.ine.archwizardduel;
 
 import br.ufsc.ine.archwizardduel.Token.Type;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.math.BigDecimal;
 
@@ -13,16 +15,15 @@ class Interpreter { // @TODO
 	}
 
 	public Expression parse(String code) {
-		return new VariableExpression(code); // @XXX: testing
-		// return parse(tokenize("(begin " + code + ")"));
+		return buildExpression(tokenize("(begin " + code + ")"));
 	}
 
 	public void interpret(Expression expr) {
 		expr.evaluate(globals);
 	}
 
-	public static LinkedList<Token> tokenize(String code) { // @XXX: protect
-		LinkedList<Token> tokens = new LinkedList<>();
+	protected static List<Token> tokenize(String code) {
+		List<Token> tokens = new LinkedList<>();
 
 		String[] input = code.split("\n");
 		lines: for (int i = 0; i < input.length; i++) {
@@ -32,11 +33,11 @@ class Interpreter { // @TODO
 				if (Character.isWhitespace(ch)) {
 					continue;
 				} if (ch == ';') {
-					break;
+					break; // continue lines
 				} else if (ch == '(') {
-					tokens.addLast(new Token(Type.LPAREN, "(", i));
+					tokens.add(new Token(Token.Type.LPAREN, "(", i));
 				} else if (ch == ')') {
-					tokens.addLast(new Token(Type.LPAREN, ")", i));
+					tokens.add(new Token(Token.Type.RPAREN, ")", i));
 				} else {
 					int end = begin + 1;
 					for (; end < line.length(); end++) {
@@ -48,27 +49,23 @@ class Interpreter { // @TODO
 					String word = line.substring(begin, end);
 					switch (word) {
 						case "begin":
-							tokens.addLast(new Token(Type.BEGIN, word, i));
+							tokens.add(new Token(Token.Type.BEGIN, word, i));
 							break;
-
 						case "if":
-							tokens.addLast(new Token(Type.IF, word, i));
+							tokens.add(new Token(Token.Type.IF, word, i));
 							break;
-
 						case "define":
-							tokens.addLast(new Token(Type.DEFINE, word, i));
+							tokens.add(new Token(Token.Type.DEFINE, word, i));
 							break;
-
 						case "lambda":
-							tokens.addLast(new Token(Type.LAMBDA, word, i));
+							tokens.add(new Token(Token.Type.LAMBDA, word, i));
 							break;
-
 						default:
 							try {
 								BigDecimal number = new BigDecimal(word);
-								tokens.addLast(new Token(Type.NUMBER, number, i));
+								tokens.add(new Token(Token.Type.NUMBER, number, i));
 							} catch (NumberFormatException _) {
-								tokens.addLast(new Token(Type.VARIABLE, word, i));
+								tokens.add(new Token(Token.Type.VARIABLE, word, i));
 							}
 							break;
 					}
@@ -81,103 +78,103 @@ class Interpreter { // @TODO
 		return tokens;
 	}
 
-	private static Token consume(List<Token> tokens, Token.Type expected) {
+	protected static Expression buildExpression(List<Token> tokens) {
+		// check for atomic expressions
+		Token first = tokens.get(0);
+		switch (first.getType()) {
+			case NUMBER:
+				Token number = consume(tokens, Token.Type.NUMBER);
+				return new NumericExpression((BigDecimal) number.getValue());
+			case VARIABLE:
+				Token variable = consume(tokens, Token.Type.VARIABLE);
+				return new VariableExpression((String) variable.getValue());
+			case LPAREN:
+				// not atomic
+				break;
+			default:
+				throw new IllegalArgumentException(
+					"Parse error at line " + first.getLine() + ": " +
+					first.toString() + "is an invalid start of expression."
+				);
+		}
+
+		// otherwise, parse some compound expression
+		switch (tokens.get(1).getType()) { // @TODO: what if got EOF? in get or remove
+			case BEGIN: {
+				consume(tokens, Token.Type.LPAREN);
+				consume(tokens, Token.Type.BEGIN);
+				List<Expression> sequence = buildExpressionList(tokens);
+				consume(tokens, Token.Type.RPAREN);
+				return new SequentialExpression(sequence);
+			}
+			case DEFINE: {
+				consume(tokens, Token.Type.LPAREN);
+				consume(tokens, Token.Type.DEFINE);
+				Token symbol = consume(tokens, Token.Type.VARIABLE);
+				Expression definition = buildExpression(tokens);
+				consume(tokens, Token.Type.RPAREN);
+				return new DefinitionExpression(
+					(String) symbol.getValue(),
+					definition
+				);
+			}
+			case IF: {
+				consume(tokens, Token.Type.LPAREN);
+				consume(tokens, Token.Type.IF);
+				Expression condition = buildExpression(tokens);
+				Expression consequence = buildExpression(tokens);
+				Expression alternative = buildExpression(tokens);
+				consume(tokens, Token.Type.RPAREN);
+				return new ConditionalExpression(
+					condition,
+					consequence,
+					alternative
+				);
+			}
+			case LAMBDA: {
+				consume(tokens, Token.Type.LPAREN);
+				consume(tokens, Token.Type.LAMBDA);
+				consume(tokens, Token.Type.LPAREN);
+				List<String> params = new ArrayList<>();
+				while (tokens.get(0).getType() != Token.Type.RPAREN) {
+					params.add(
+						(String) consume(tokens, Token.Type.VARIABLE).getValue()
+					);
+				}
+				consume(tokens, Token.Type.RPAREN);
+				List<Expression> body = buildExpressionList(tokens);
+				consume(tokens, Token.Type.RPAREN);
+				return new LambdaExpression(
+					params,
+					new SequentialExpression(body)
+				);
+			}
+			default: { // case APPLICATION:
+				consume(tokens, Token.Type.LPAREN);
+				Expression operator = buildExpression(tokens);
+				List<Expression> operands = buildExpressionList(tokens);
+				consume(tokens, Token.Type.RPAREN);
+				return new ApplicationExpression(operator, operands);
+			}
+		}
+	}
+
+	protected static List<Expression> buildExpressionList(List<Token> tokens) {
+		List<Expression> exprs = new ArrayList<>();
+		while (tokens.get(0).getType() != Token.Type.RPAREN)
+			exprs.add(buildExpression(tokens));
+		return exprs;
+	}
+
+	protected static Token consume(List<Token> tokens, Token.Type expected) {
 		Token symbol = tokens.remove(0);
 		if (symbol.getType() == expected)
 			return symbol;
 		else
 			throw new IllegalArgumentException(
 				"Parse error at line " + symbol.getLine() + ": " +
-				" expected " + expected.name() +
-				", found " + symbol + "."
+				"expected " + expected.name() + ", found " + symbol.toString() + "."
 			);
-	}
-
-	private static List<Expression> buildExpressionList(List<Token> tokens) {
-		List<Expression> expList = new ArrayList<>();
-		while (tokens.get(0).getType() != Token.Type.RPAREN)
-			expList.add(buildExpression(tokens));
-		return expList;
-	}
-
-	private static Expression buildExpression(List<Token> tokens) {
-		// compound
-		if (tokens.get(0).getType() == Token.Type.LPAREN) {
-			switch (tokens.get(1).getType()) {
-				case BEGIN: {
-					consume(tokens, Token.Type.LPAREN);
-					consume(tokens, Token.Type.BEGIN);
-					List<Expression> sequence = buildExpressionList(tokens);
-					consume(tokens, Token.Type.RPAREN);
-					return new SequentialExpression(sequence);
-				}
-
-				case DEFINE: {
-					consume(tokens, Token.Type.LPAREN);
-					consume(tokens, Token.Type.DEFINE);
-					Token symbol = consume(tokens, Token.Type.VARIABLE);
-					Expression definition = buildExpression(tokens);
-					consume(tokens, Token.Type.RPAREN);
-					return new DefinitionExpression(symbol.toString(), definition);
-				}
-
-				case IF: {
-					consume(tokens, Token.Type.LPAREN);
-					consume(tokens, Token.Type.IF);
-					Expression condition = buildExpression(tokens);
-					Expression consequence = buildExpression(tokens);
-					Expression alternative = buildExpression(tokens); // @TODO: what if not ternary
-					consume(tokens, Token.Type.RPAREN);
-					return new ConditionalExpression(condition, consequence, alternative);
-				}
-
-				case LAMBDA: {
-					consume(tokens, Token.Type.LPAREN);
-					consume(tokens, Token.Type.LAMBDA);
-
-					// build formal parameters
-					consume(tokens, Token.Type.LPAREN);
-					List<Expression> params = buildExpressionList(tokens);
-					consume(tokens, Token.Type.RPAREN);
-
-					// build body
-					List<Expression> body = buildExpressionList(tokens);
-
-					consume(tokens, Token.Type.RPAREN);
-					return new LambdaExpression(params, new SequentialExpression(body));
-				}
-
-				default: {
-					consume(tokens, Token.Type.LPAREN);
-					Token operator = consume(tokens, Token.Type.VARIABLE);
-					List<Expression> operands = buildExpressionList(tokens);
-					consume(tokens, Token.Type.RPAREN);
-					return new ApplicationExpression(operator, operands);
-				}
-			}
-
-		// atomic
-		} else {
-			Token atom = consume(tokens, Token.Type.VARIABLE, Token.Type.NUMBER);
-			return new Expression(atom);
-		}
-	}
-
-	public static void main(String[] args) {
-		String input =
-			  "(begin"
-			+ "    (define a 1.5)"
-			+ "    (define var b)"
-			+ "    (lambda (x y) (+ x y))"
-			+ "    (define sum (lambda (x y) (+ x y)))"
-			+ "    (define twentytwo 22)"
-			+ "    (define avg (lambda (x y) (/ (+ x y) 2)))"
-			+ "    (define distance (lambda (x1 y1 x2 y2) (sqrt (+ (exp (- x1 x2) 2) (exp (- y1 y2) 2)))))"
-					// out-of-range 64bit integer literal (for java)
-			+ "    (define HUGE! 10000000000000000000000000000000000000000000000000000000028132130913223456)"
-			+ ")";
-
-		System.out.println(buildExpression(Interpreter.tokenize(input)).toString());
 	}
 
 }
