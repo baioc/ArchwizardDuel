@@ -3,9 +3,9 @@ package br.ufsc.ine.archwizardduel;
 import java.util.List;
 import java.util.ArrayList;
 
-class Arena {
+class Arena { // @TODO
 
-	private final Interpreter executor = new Interpreter();
+	private final Interpreter executor = null; // @TODO: evaluator initialization
 	private List<Player> players;
 	private List<Wizard> characters;
 	private int currentTurn;
@@ -19,7 +19,7 @@ class Arena {
 	}
 
 	public Expression makePlay(String code) {
-		return executor.parse(code);
+		return new VariableExpression(code); // @XXX: testing
 	}
 
 	public boolean isLocalTurn() {

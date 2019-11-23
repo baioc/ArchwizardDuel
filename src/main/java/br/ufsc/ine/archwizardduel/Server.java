@@ -11,13 +11,16 @@ import br.ufsc.inf.leobr.cliente.Jogada;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Represents the game server and both (@FIXME) its client-side and session-side
+ * interfaces.
+ */
 public class Server implements OuvidorProxy {
 
 	private Proxy proxy;
 	private Client user;
 	private Session connection;
 	private boolean hasQuit;
-	private String ip;
 
 	public Server() {
 		proxy = Proxy.getInstance();
@@ -29,7 +32,7 @@ public class Server implements OuvidorProxy {
 	/*************************** CLIENT INTERFACE *****************************/
 
 	public Session makeSession(Client host) {
-		return connect(host, "localhost", true);
+		return connect(host, "localhost", true); // @TODO: host session on variable IP
 	}
 
 	public Session joinSession(Client client, String ip) {
@@ -44,23 +47,21 @@ public class Server implements OuvidorProxy {
 				leaveSession();
 				return null;
 			}
-			this.ip = ip;
 			hasQuit = false;
 			connection = new Session(this, localHost);
-		} catch (JahConectadoException ex) {
-			ex.printStackTrace();
-		} catch (NaoPossivelConectarException | ArquivoMultiplayerException ex) {
-			user.showMessage("Could not connect to " + ip + ":\n" + ex.getMessage());
-		} finally {
-			return connection;
+		} catch (JahConectadoException e) {
+			e.printStackTrace();
+		} catch (NaoPossivelConectarException | ArquivoMultiplayerException e) {
+			user.showMessage("Could not connect to " + ip + ":\n" + e.getMessage());
 		}
+		return connection;
 	}
 
 	public void leaveSession() {
 		try {
 			proxy.desconectar();
-		} catch (NaoConectadoException ex) {
-			ex.printStackTrace();
+		} catch (NaoConectadoException e) {
+			e.printStackTrace();
 		}
 		connection = null;
 	}
@@ -71,8 +72,8 @@ public class Server implements OuvidorProxy {
 	public void beginMatch() {
 		try{
 			proxy.iniciarPartida(2);
-		} catch (NaoConectadoException ex) {
-			ex.printStackTrace();
+		} catch (NaoConectadoException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -80,17 +81,17 @@ public class Server implements OuvidorProxy {
 		hasQuit = true;
 		try {
 			proxy.finalizarPartida();
-		} catch (NaoConectadoException | NaoJogandoException ex) {
-			ex.printStackTrace();
+		} catch (NaoConectadoException | NaoJogandoException e) {
+			e.printStackTrace();
 		}
 	}
 
 	public void send(Expression code) {
 		try {
-			proxy.enviaJogada((Jogada) code);
-			user.showMessage("Sent!");
-		} catch (NaoJogandoException ex) {
-			ex.printStackTrace();
+			proxy.enviaJogada((Jogada) code); // @TODO: test valid code?
+			user.showMessage("Sent!"); // @XXX: needed?
+		} catch (NaoJogandoException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -120,7 +121,7 @@ public class Server implements OuvidorProxy {
 	@Override
 	public void receberJogada(Jogada jogada) {
 		final Expression expr = (Expression) jogada;
-		user.showMessage("Received:\n" + expr.toString());
+		user.showMessage("Received:\n" + expr.toString()); // @XXX: needed?
 		connection.pull(expr);
 	}
 
@@ -147,7 +148,9 @@ public class Server implements OuvidorProxy {
 	}
 
 	@Override
-	public void receberMensagem(String msg) {}
+	public void receberMensagem(String msg) {
+		user.showMessage(msg);
+	}
 
 	@Override
 	public void tratarPartidaNaoIniciada(String message) {}
