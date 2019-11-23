@@ -1,8 +1,11 @@
 package br.ufsc.ine.archwizardduel;
 
 import java.util.List;
-import java.util.ArrayList;
 
+/**
+ * Represents the multiplayer sessions and both (@FIXME) its server-side and
+ * client-side interfaces.
+ */
 class Session {
 
 	private final Server server;
@@ -39,7 +42,7 @@ class Session {
 
 	public void pull(Expression code) {
 		remotePlayer.setNextPlay(code);
-		match.nextTurn();
+		match.nextTurn(); // @FIXME: turn logic
 	}
 
 
@@ -60,7 +63,7 @@ class Session {
 		match = null;
 	}
 
-	public void push(String code) {
+	public void push(String code) { // @FIXME: turn logic
 		if (match.isLocalTurn()) {
 			final Expression play = match.makePlay(code); // @TODO: test valid code?
 			server.send(play);

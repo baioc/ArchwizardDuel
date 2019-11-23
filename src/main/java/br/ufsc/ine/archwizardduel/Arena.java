@@ -3,7 +3,7 @@ package br.ufsc.ine.archwizardduel;
 import java.util.List;
 import java.util.ArrayList;
 
-class Arena {
+class Arena { // @TODO
 
 	private final Interpreter executor = null; // @TODO: evaluator initialization
 	private List<Player> players;

@@ -3,7 +3,6 @@ package br.ufsc.ine.archwizardduel;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
-import br.ufsc.ine.archwizardduel.Interpreter.ParseException;
 
 public class LispTest {
 
@@ -23,7 +22,7 @@ public class LispTest {
 		Expression compiled = null;
 		try {
 			compiled = evaluator.parse(code);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			assumeNoException(e);
 		}
 
@@ -36,55 +35,118 @@ public class LispTest {
 			compiled.toString()
 		);
 
-		assertEquals("-1", evaluator.interpret(compiled));
+		try {
+			evaluator.interpret(compiled);
+		} catch (Exception e) {
+			assumeNoException(e);
+		}
 	}
 
 	@Test
-	public void testMissingParenthesis() {
+	public void testInvalidSyntax() {
 		Interpreter evaluator = new Interpreter();
 
-		String code = "(if +4.5e-9 (+ 1 2) (- 1 2)"; // closing parenthesis missing
-
-		ParseException ex = null;
-		try {
-			Expression compiled = evaluator.parse(code);
-		} catch (ParseException e) {
-			ex = e;
+		{ // closing parenthesis missing
+			String code = "(if +4.5e-9 (+ 1 2) (- 1 2)";
+			Exception ex = null;
+			try {
+				evaluator.parse(code);
+			} catch (Exception e) {
+				ex = e;
+			}
+			assertNotNull(ex);
+			// System.err.println(ex.getMessage());
 		}
 
-		assertNotNull(ex);
+		{ // extra parenthesis added
+			String code = ") \n(if +4.5e-9 (+ 1 2) (- 1 2))";
+			Exception ex = null;
+			try {
+				evaluator.parse(code);
+			} catch (Exception e) {
+				ex = e;
+			}
+			assertNotNull(ex);
+			// System.err.println(ex.getMessage());
+		}
+
+		{ // usage of reserved words
+			String code = "(if begin (define lambda))";
+			Exception ex = null;
+			try {
+				evaluator.parse(code);
+			} catch (Exception e) {
+				ex = e;
+			}
+			assertNotNull(ex);
+			// System.err.println(ex.getMessage());
+		}
 	}
 
 	@Test
-	public void testExtraParenthesis() {
-		Interpreter evaluator = new Interpreter();
+	public void testRuntimeError() {
+		Interpreter evaluator = new Interpreter(new Frame());
 
-		String code = ") \n(if +4.5e-9 (+ 1 2) (- 1 2))"; // extra parenthesis added
-
-		ParseException ex = null;
-		try {
-			Expression compiled = evaluator.parse(code);
-		} catch (ParseException e) {
-			ex = e;
+		{ // operation over unexpected types
+			String code = "(+ 1 false)";
+			Expression compiled = null;
+			try {
+				compiled = evaluator.parse(code);
+			} catch (Exception e) {
+				assumeNoException(e);
+			}
+			assertEquals("(begin (+ 1 false))", compiled.toString());
+			Exception ex = null;
+			try {
+				evaluator.interpret(compiled);
+			} catch (Exception e) {
+				ex = e;
+			}
+			assertNotNull(ex);
+			// System.err.println(ex.getMessage());
 		}
 
-		assertNotNull(ex);
-	}
-
-	@Test
-	public void testKeywords() {
-		Interpreter evaluator = new Interpreter();
-
-		String code = "(if begin (define lambda))";
-
-		ParseException ex = null;
-		try {
-			Expression compiled = evaluator.parse(code);
-		} catch (ParseException e) {
-			ex = e;
+		{ // undefined variable
+			String code = "(* x x)";
+			Expression compiled = null;
+			try {
+				compiled = evaluator.parse(code);
+			} catch (Exception e) {
+				assumeNoException(e);
+			}
+			assertEquals("(begin (* x x))", compiled.toString());
+			Exception ex = null;
+			try {
+				evaluator.interpret(compiled);
+			} catch (Exception e) {
+				ex = e;
+			}
+			assertNotNull(ex);
+			// System.err.println(ex.getMessage());
 		}
 
-		assertNotNull(ex);
+		{ // invalid number of arguments
+			String code = "(define abs (lambda (x) (if (>= x 0) x (* -1 x))))\n" +
+			              "(abs)";
+			Expression compiled = null;
+			try {
+				compiled = evaluator.parse(code);
+			} catch (Exception e) {
+				assumeNoException(e);
+			}
+			assertEquals(
+				"(begin (define abs (lambda (x) (begin (if (>= x 0) x (* -1 x))))) (abs))",
+				compiled.toString()
+			);
+			Exception ex = null;
+			try {
+				evaluator.interpret(compiled);
+			} catch (Exception e) {
+				ex = e;
+			}
+			assertNotNull(ex);
+			// System.err.println(ex.getMessage());
+		}
 	}
 
 }
