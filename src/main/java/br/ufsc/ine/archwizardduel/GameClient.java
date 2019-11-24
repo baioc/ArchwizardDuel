@@ -85,12 +85,12 @@ public class GameClient extends JFrame implements Client {
 
 		disconnectButton = new JButton("Quit Session");
 		disconnectButton.addActionListener(e -> leaveSession());
-		disconnectButton.setBounds(rightAligned, bottom, buttonWidth, buttonHeight);
+		disconnectButton.setBounds(leftAligned, bottom, buttonWidth, buttonHeight);
 		this.add(disconnectButton);
 
 		startGame = new JButton("Start Match");
 		startGame.addActionListener(e -> startMatch());
-		startGame.setBounds(leftAligned, bottom, buttonWidth, buttonHeight);
+		startGame.setBounds(rightAligned, bottom, buttonWidth, buttonHeight);
 		this.add(startGame);
 
 		exitGame = new JButton("Quit Match");
@@ -175,21 +175,6 @@ public class GameClient extends JFrame implements Client {
 			}
 		}
 
-		// @DEBUG: testing
-		GameObject[][] test = new GameObject[map.length][map[0].length];
-		for (int i = 0; i < test.length; ++i)
-			for (int j = 0; j < test[i].length; ++j)
-				test[i][j] = new GameObject(GameObject.Type.EMPTY, null);
-		Wizard p1 = new Wizard("a", 0, 0);
-		test[1][0] = new GameObject(GameObject.Type.WIZARD, p1);
-		p1.rotate(Wizard.Direction.DOWN);
-		Wizard p2 = new Wizard("a", 0, 0);
-		test[1][test[1].length-1] = new GameObject(GameObject.Type.WIZARD, p2);
-		p2.rotate(Wizard.Direction.DOWN);
-		test[1][9] = new GameObject(GameObject.Type.ROCK, null);
-		test[1][10] = new GameObject(GameObject.Type.FIREBALL, null);
-		update(test);
-
 		setVisible(true);
 		showBegin();
 	}
@@ -250,7 +235,7 @@ public class GameClient extends JFrame implements Client {
 	}
 
 	@Override
-	public void update(GameObject[][] world) { // @TODO: test this
+	public void update(GameObject[][] world) {
 		for (int i = 0; i < map.length; ++i) {
 			for (int j = 0; j < map[i].length; ++j) {
 				ImageIcon updated = null;
@@ -277,7 +262,7 @@ public class GameClient extends JFrame implements Client {
 					case ROCK:
 						updated = rock;
 						break;
-					case EMPTY: default:
+					case EMPTY:
 						updated = ground;
 						break;
 				}

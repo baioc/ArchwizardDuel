@@ -45,8 +45,12 @@ public class GameServer implements Server, OuvidorProxy {
 		try {
 			proxy.conectar(ip, user.getPlayer().getName());
 
-			if (localHost && (players() != null)) {
+			if (localHost && proxy.obterNomeAdversarios().size() > 0) {
 				user.notify("Failed to host session: someone is already there.");
+				leaveSession();
+				return null;
+			} else if (!localHost && proxy.obterNomeAdversarios().size() < 1) {
+				user.notify("Failed to join session: there is nobody there.");
 				leaveSession();
 				return null;
 			}
@@ -105,17 +109,17 @@ public class GameServer implements Server, OuvidorProxy {
 	public void send(SerializedExpression play) {
 		try {
 			proxy.enviaJogada((Jogada) play);
-			user.notify("Sent!"); // @DEBUG
+			user.notify("Sent play!");
 		} catch (NaoJogandoException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Gets the list players in the remote match.
+	 * Gets the list of players in the remote match.
 	 *
 	 * @return null when there aren't enough connected players, otherwise a
-	 *         List with those players
+	 *         List with those players, where the first player is local.
 	 */
 	public List<Player> players() {
 		final List<String> remotes = proxy.obterNomeAdversarios();
@@ -143,7 +147,7 @@ public class GameServer implements Server, OuvidorProxy {
 	@Override
 	public void receberJogada(Jogada jogada) {
 		final SerializedExpression play = (SerializedExpression) jogada;
-		user.notify("Received!"); // @DEBUG
+		user.notify("Received play!");
 		connection.pull(play);
 	}
 

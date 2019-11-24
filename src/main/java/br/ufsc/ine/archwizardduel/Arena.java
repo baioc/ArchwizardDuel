@@ -1,5 +1,7 @@
 package br.ufsc.ine.archwizardduel;
 
+import br.ufsc.ine.archwizardduel.GameObject;
+import br.ufsc.ine.archwizardduel.Wizard;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -37,6 +39,21 @@ class Arena {
 	}
 
 	public void nextTurn() { // @TODO: game over condition
+		// @DEBUG: testing
+		GameObject[][] test = new GameObject[3][15];
+		for (int i = 0; i < test.length; ++i)
+			for (int j = 0; j < test[i].length; ++j)
+				test[i][j] = new GameObject(GameObject.Type.EMPTY, null);
+		Wizard p1 = new Wizard("a", 0, 0);
+		test[1][0] = new GameObject(GameObject.Type.WIZARD, p1);
+		p1.rotate(Wizard.Direction.DOWN);
+		Wizard p2 = new Wizard("a", 0, 0);
+		test[1][test[1].length-1] = new GameObject(GameObject.Type.WIZARD, p2);
+		p2.rotate(Wizard.Direction.DOWN);
+		test[1][9] = new GameObject(GameObject.Type.ROCK, null);
+		test[1][10] = new GameObject(GameObject.Type.FIREBALL, null);
+		user.update(test);
+
 		Player currentPlayer = players.get(current);
 		Expression play = currentPlayer.getNextPlay();
 		current = (current + 1) % players.size();
