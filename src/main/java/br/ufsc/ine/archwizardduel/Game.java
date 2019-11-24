@@ -6,7 +6,7 @@ package br.ufsc.ine.archwizardduel;
 public class Game {
 
 	public static void main(String[] args) {
-		new Client(new Server());
+		new GameClient(new GameServer());
 	}
 
 }

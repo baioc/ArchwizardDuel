@@ -3,7 +3,7 @@ package br.ufsc.ine.archwizardduel;
 import java.util.List;
 import java.util.ArrayList;
 
-class Arena implements Runnable {
+class Arena {
 
 	private final Interpreter evaluator;
 	private List<Player> players;
@@ -20,7 +20,11 @@ class Arena implements Runnable {
 		gameOver = false;
 		characters = new ArrayList<>(participants.size());
 		for (Player p : participants)
-			characters.add(new Wizard(p.getName()));
+			characters.add(new Wizard(p.getName(), 0, 0)); // @TODO: game world
+	}
+
+	public boolean isLocalTurn() {
+		return current == 0;
 	}
 
 	public Expression makePlay(String code) {
@@ -32,25 +36,17 @@ class Arena implements Runnable {
 		return null;
 	}
 
-	public boolean isLocalTurn() {
-		return current == 0;
-	}
-
-	public void stop() {
-		gameOver = true;
-	}
-
-	@Override
-	public void run() {
-		while (!gameOver) { // @TODO: game over condition
-			int actual = current;
-			current = (current + 1) % players.size();
-			Expression play = players.get(current).getNextPlay();
-			try {
-				evaluator.interpret(play);
-			} catch (Exception e) {
-				display.notify(e.getMessage());
-			}
+	public void nextTurn() { // @TODO: game over condition
+		Player currentPlayer = players.get(current);
+		Expression play = currentPlayer.getNextPlay();
+		current = (current + 1) % players.size();
+		try {
+			evaluator.interpret(play);
+		} catch (Exception e) {
+			display.notify(
+				"Invalid play from " + currentPlayer.getName() +
+				": " + e.getMessage()
+			);
 		}
 	}
 
