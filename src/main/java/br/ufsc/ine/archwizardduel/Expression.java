@@ -1,11 +1,9 @@
 package br.ufsc.ine.archwizardduel;
 
-import br.ufsc.inf.leobr.cliente.Jogada;
-
 /**
  * Provides the functional interface of all Lisp-like expressions.
  */
-public interface Expression extends Jogada {
+public interface Expression {
 
 	/**
 	 * Evaluates the expression with respect to a given environment.

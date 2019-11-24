@@ -95,7 +95,7 @@ public class Client extends JFrame { // @FIXME
 			username = JOptionPane.showInputDialog(
 				this, "Please enter a valid username:"
 			);
-		} while (username == null);
+		} while (username == null || username.length() == 0);
 
 		player = new Player(username);
 		network = server;
@@ -198,7 +198,7 @@ public class Client extends JFrame { // @FIXME
 	/**
 	 * Notifies the user of some event.
 	 */
-	public void showMessage(String msg) {
+	public void notify(String msg) {
 		JOptionPane.showMessageDialog(
 			this, msg, "Notification", JOptionPane.PLAIN_MESSAGE
 		);
@@ -307,14 +307,20 @@ public class Client extends JFrame { // @FIXME
 	/**************************** PRIVATE METHODS *****************************/
 
 	private void makeSession() {
-		if ((connection = network.makeSession(this)) != null)
+		final String ip = JOptionPane.showInputDialog(
+			this,
+			"Enter IP address where session will be hosted:",
+			"localhost"
+		);
+		if (ip != null && (connection = network.makeSession(this, ip)) != null)
 			showSession();
 	}
 
 	private void joinSession() {
 		final String ip = JOptionPane.showInputDialog(
 			this,
-			"Enter IP address of session to be joined:"
+			"Enter IP address of session to be joined:",
+			"127.0.0.1"
 		);
 		if (ip != null && (connection = network.joinSession(this, ip)) != null)
 			showSession();
@@ -326,7 +332,7 @@ public class Client extends JFrame { // @FIXME
 	}
 
 	private void startMatch() {
-		if (connection.startMatch())
+		if (connection.startMatch(this))
 			showMatch();
 	}
 

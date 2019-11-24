@@ -31,8 +31,8 @@ public class Server implements OuvidorProxy {
 
 	/*************************** CLIENT INTERFACE *****************************/
 
-	public Session makeSession(Client host) {
-		return connect(host, "localhost", true); // @TODO: host session on variable IP
+	public Session makeSession(Client host, String ip) {
+		return connect(host, ip, true);
 	}
 
 	public Session joinSession(Client client, String ip) {
@@ -52,7 +52,7 @@ public class Server implements OuvidorProxy {
 		} catch (JahConectadoException e) {
 			e.printStackTrace();
 		} catch (NaoPossivelConectarException | ArquivoMultiplayerException e) {
-			user.showMessage("Could not connect to " + ip + ":\n" + e.getMessage());
+			user.notify("Could not connect to " + ip + ":\n" + e.getMessage());
 		}
 		return connection;
 	}
@@ -86,10 +86,10 @@ public class Server implements OuvidorProxy {
 		}
 	}
 
-	public void send(Expression code) {
+	public void send(SerializedExpression code) {
 		try {
-			proxy.enviaJogada((Jogada) code); // @TODO: test valid code?
-			user.showMessage("Sent!"); // @XXX: needed?
+			proxy.enviaJogada((Jogada) code);
+			user.notify("Sent!"); // @XXX: needed?
 		} catch (NaoJogandoException e) {
 			e.printStackTrace();
 		}
@@ -114,14 +114,14 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void iniciarNovaPartida(Integer posicao) {
-		if (connection.makeMatch())
+		if (connection.makeMatch(user))
 			user.showMatch();
 	}
 
 	@Override
 	public void receberJogada(Jogada jogada) {
-		final Expression expr = (Expression) jogada;
-		user.showMessage("Received:\n" + expr.toString()); // @XXX: needed?
+		final SerializedExpression expr = (SerializedExpression) jogada;
+		user.notify("Received!"); // @XXX: needed?
 		connection.pull(expr);
 	}
 
@@ -133,10 +133,10 @@ public class Server implements OuvidorProxy {
 		}
 
 		if (connection.isLocallyHosted()) {
-			user.showMessage("Remote connection error:\n" + message);
+			user.notify("Remote connection error:\n" + message);
 			user.showSession();
 		} else {
-			user.showMessage("Host connection error:\n" + message);
+			user.notify("Host connection error:\n" + message);
 			user.showBegin();
 			leaveSession();
 		}
@@ -149,7 +149,7 @@ public class Server implements OuvidorProxy {
 
 	@Override
 	public void receberMensagem(String msg) {
-		user.showMessage(msg);
+		user.notify(msg);
 	}
 
 	@Override

@@ -29,27 +29,27 @@ class Session {
 		return localHost;
 	}
 
-	public boolean makeMatch() {
+	public boolean makeMatch(Client display) {
 		final List<Player> participants = server.getPlayers();
 		if (participants != null) {
 			localPlayer = participants.get(0);
 			remotePlayer = participants.get(1);
-			match = new Arena(participants, localHost ? 0 : 1); // @TODO: arena on a separate Thread?
+			match = new Arena(participants, localHost ? 0 : 1, display);
+			new Thread(match).start();
 			return true;
 		}
 		return false;
 	}
 
-	public void pull(Expression code) {
-		remotePlayer.setNextPlay(code);
-		match.nextTurn(); // @FIXME: turn logic
+	public void pull(SerializedExpression code) {
+		remotePlayer.setNextPlay(match.makePlay(code.toString()));
 	}
 
 
 	/*************************** CLIENT INTERFACE *****************************/
 
-	public boolean startMatch() {
-		if (localHost && makeMatch()) {
+	public boolean startMatch(Client display) {
+		if (localHost && makeMatch(display)) {
 			server.beginMatch();
 			return true;
 		}
@@ -60,15 +60,18 @@ class Session {
 		server.quitMatch();
 		localPlayer = null;
 		remotePlayer = null;
+		match.stop();
 		match = null;
 	}
 
-	public void push(String code) { // @FIXME: turn logic
-		if (match.isLocalTurn()) {
-			final Expression play = match.makePlay(code); // @TODO: test valid code?
-			server.send(play);
+	public void push(String code) {
+		if (!match.isLocalTurn())
+			return;
+
+		final Expression play = match.makePlay(code);
+		if (play != null) {
 			localPlayer.setNextPlay(play);
-			match.nextTurn();
+			server.send(new SerializedExpression(play));
 		}
 	}
 
