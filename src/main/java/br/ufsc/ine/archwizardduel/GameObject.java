@@ -15,8 +15,8 @@ class GameObject {
 		ROCK,
 	}
 
-	private final Type type;
-	private final Object obj;
+	private Type type;
+	private Object obj;
 
 	/**
 	 * Generic type constructor.
@@ -26,11 +26,23 @@ class GameObject {
 	 * @param obj  encapsulated Object, should match the given Type
 	 */
 	public GameObject(Type type, Object obj) {
+		set(type, obj);
+	}
+
+	/**
+	 * Assigns new values to this container. Make sure its parameters match.
+	 *
+	 * @param type this game object's type
+	 * @param obj  encapsulated Object, should match the given Type
+	 */
+	public void set(Type type, Object obj) {
 		this.type = type;
 		this.obj = obj;
 	}
 
 	/**
+	 * Gets this game object's type.
+	 *
 	 * @return this object's type
 	 */
 	public Type type() {
@@ -38,7 +50,9 @@ class GameObject {
 	}
 
 	/**
-	 * Actual data contained in this object, should be cast according to type().
+	 * Gets the data contained herein, should be cast according to type().
+	 *
+	 * @return raw object
 	 */
 	public Object object() {
 		return obj;

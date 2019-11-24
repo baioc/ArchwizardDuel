@@ -42,6 +42,7 @@ class GameSession implements Session {
 	public boolean makeMatch(Client display) {
 		final List<Player> participants = server.players();
 		if (participants != null) {
+			// @XXX: fixed number of players
 			localPlayer = participants.get(0);
 			remotePlayer = participants.get(1);
 			match = new Arena(participants, localHost ? 0 : 1, display);

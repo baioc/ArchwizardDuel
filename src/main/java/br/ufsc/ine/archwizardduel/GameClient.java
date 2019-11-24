@@ -55,6 +55,7 @@ public class GameClient extends JFrame implements Client {
 		setLayout(null);
 		setResizable(false);
 		setSize(WIDTH, HEIGHT);
+		setVisible(true);
 
 		String username = null;
 		do {
@@ -175,7 +176,6 @@ public class GameClient extends JFrame implements Client {
 			}
 		}
 
-		setVisible(true);
 		showBegin();
 	}
 
@@ -235,7 +235,7 @@ public class GameClient extends JFrame implements Client {
 	}
 
 	@Override
-	public void update(GameObject[][] world) {
+	public void update(GameObject[][] world) { // @TODO: show players status
 		for (int i = 0; i < map.length; ++i) {
 			for (int j = 0; j < map[i].length; ++j) {
 				ImageIcon updated = null;

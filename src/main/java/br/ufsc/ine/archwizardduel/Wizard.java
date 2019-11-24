@@ -25,6 +25,7 @@ class Wizard {
 		this.health = 100;
 		this.mana = 100;
 		position = new int[]{x, y};
+		rotation = Direction.DOWN;
 	}
 
 	/**
