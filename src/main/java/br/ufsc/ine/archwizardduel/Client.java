@@ -21,11 +21,55 @@ public class Client extends JFrame {
 	private JButton playButton;
 	private JScrollPane textArea;
 	private JTextArea typeHere;
-	private JLabel placeHolder;
 
 	private final Server network;
 	private Player player;
 	private Session connection;
+
+	/*
+		0 = Blank Tile
+		1 = You
+		2 = Second player
+		3 = P1 throws fire
+		4 = P2 throws fire
+	*/
+	private int LEVEL_WIDTH = 15;
+	private int LEVEL_HEIGHT = 3;
+	private int level[][] = new int[LEVEL_HEIGHT][LEVEL_WIDTH];
+
+	/*
+		TILES:
+
+		wizard:
+
+		[X] [] [] [] []
+		[X] [] [] [] []
+		[X] [] [] [] []
+		ou
+		[] [] [] [] [X]
+		[] [] [] [] [X]
+		[] [] [] [] [X]
+
+		blank:
+
+		[X] [X] [X] [X] [X]
+		[X] [X] [X] [X] [X]
+		[X] [X] [X] [X] [X]
+
+		weapon:
+
+		[] [X] [X] [X] []
+		[] [X] [X] [X] []
+		[] [X] [X] [X] []
+
+	*/
+	private JLabel wizardOne[] = new JLabel[LEVEL_HEIGHT];
+	private JLabel wizardTwo[] = new JLabel[LEVEL_HEIGHT];
+	private JLabel ground[][] = new JLabel[LEVEL_HEIGHT][LEVEL_WIDTH];
+	private JLabel fireOne[][] = new JLabel[LEVEL_HEIGHT][LEVEL_WIDTH - 2];
+	private JLabel fireTwo[][] = new JLabel[LEVEL_HEIGHT][LEVEL_WIDTH - 2];
+
+	private JLabel status;
 
 
 	/*************************** PUBLIC INTERFACE *****************************/
@@ -78,10 +122,56 @@ public class Client extends JFrame {
 		textArea.setBounds(0*WIDTH, HEIGHT/2, WIDTH, HEIGHT/3);
 		this.add(textArea);
 
-		placeHolder = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("wol.jpeg")));
-		placeHolder.setBounds(0*WIDTH, 0*HEIGHT + 30, WIDTH, HEIGHT/3 + height);
-		this.add(placeHolder);
+		level[1][0] = 1; // PLAYER 1 INITIAL POSITION
+		level[1][LEVEL_WIDTH - 1] = 2; // PLAYER 2 INITIAL POSITION
 
+		// TEST FIRES
+		level[1][10] = 3;
+		level[0][3] = 4;
+
+		int space = 40;
+		int th = 66;
+		int tw = 48;
+
+		// I NEED TO KNOW IF I'M P1 OR P2
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			for (int j = 0; j < LEVEL_WIDTH; ++j) {
+				ground[i][j] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("ground.jpg")));
+				ground[i][j].setBounds(space + j * tw, i * th, tw, th);
+				this.add(ground[i][j]);
+				ground[i][j].setVisible(false);
+			}
+		}
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			wizardOne[i] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("player1.jpg")));
+			wizardTwo[i] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("player2.jpg")));
+			wizardOne[i].setBounds(space, i * th, tw, th);
+			wizardTwo[i].setBounds(space + (LEVEL_WIDTH - 1) * tw, i * th, tw, th);
+			this.add(wizardOne[i]);
+			this.add(wizardTwo[i]);
+			wizardOne[i].setVisible(false);
+			wizardTwo[i].setVisible(false);
+		}
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			for (int j = 0; j < LEVEL_WIDTH - 2; ++j) {
+				fireOne[i][j] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("weapon1.jpg")));
+				fireTwo[i][j] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("weapon2.jpg")));
+				fireOne[i][j].setBounds(space + tw * (1 + j), th * i, tw, th);
+				fireTwo[i][j].setBounds(space + tw * (1 + j), th * i, tw, th);
+				this.add(fireOne[i][j]);
+				this.add(fireTwo[i][j]);
+				fireOne[i][j].setVisible(false);
+				fireTwo[i][j].setVisible(false);
+			}
+		}
+
+		status = new JLabel("Mana = 10000");
+		status.setBounds(300, 210, 100, 50);
+		this.add(status);
+		status.setVisible(false);
 		showBegin();
 	}
 
@@ -93,8 +183,59 @@ public class Client extends JFrame {
 		JOptionPane.showMessageDialog(this, msg, "Notification", JOptionPane.PLAIN_MESSAGE);
 	}
 
+	private void deselectScreen() {
+		status.setVisible(false);
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			for (int j = 0; j < LEVEL_WIDTH; ++j) {
+				ground[i][j].setVisible(false);
+			}
+		}
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			for (int j = 0; j < LEVEL_WIDTH - 2; ++j) {
+				fireOne[i][j].setVisible(false);
+				fireTwo[i][j].setVisible(false);
+			}
+		}
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			wizardOne[i].setVisible(false);
+			wizardTwo[i].setVisible(false);
+		}
+	}
+
+	private void updateScreen() {
+		status.setVisible(true);
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			for (int j = 0; j < LEVEL_WIDTH; ++j) {
+				if (level[i][j] == 0) {
+					ground[i][j].setVisible(true);
+				}
+			}
+		}
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			for (int j = 0; j < LEVEL_WIDTH - 2; ++j) {
+				if (level[i][j + 1] == 3) {
+					fireOne[i][j].setVisible(true);
+				} if (level[i][j + 1] == 4) {
+					fireTwo[i][j].setVisible(true);
+				}
+			}
+		}
+
+		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+			if (level[i][0] == 1) {
+				wizardOne[i].setVisible(true);
+			} if (level[i][LEVEL_WIDTH - 1] == 2) {
+				wizardTwo[i].setVisible(true);
+			}
+		}
+	}
+
 	public void showBegin() {
 		connection = null;
+		deselectScreen();
 		hostButton.setVisible(true);
 		connectButton.setVisible(true);
 		disconnectButton.setVisible(false);
@@ -103,11 +244,11 @@ public class Client extends JFrame {
 		playButton.setVisible(false);
 		textArea.setVisible(false);
 		typeHere.setVisible(false);
-		placeHolder.setVisible(false);
 		this.repaint();
 	}
 
 	public void showSession() {
+		deselectScreen();
 		hostButton.setVisible(false);
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(true);
@@ -116,7 +257,6 @@ public class Client extends JFrame {
 		playButton.setVisible(false);
 		textArea.setVisible(false);
 		typeHere.setVisible(false);
-		placeHolder.setVisible(false);
 		this.repaint();
 	}
 
@@ -129,7 +269,7 @@ public class Client extends JFrame {
 		playButton.setVisible(true);
 		textArea.setVisible(true);
 		typeHere.setVisible(true);
-		placeHolder.setVisible(true);
+		updateScreen();
 		this.repaint();
 	}
 
