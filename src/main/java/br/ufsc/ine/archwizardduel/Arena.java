@@ -3,31 +3,51 @@ package br.ufsc.ine.archwizardduel;
 import java.util.List;
 import java.util.ArrayList;
 
-class Arena { // @TODO
+class Arena {
 
-	private final Interpreter executor = null; // @TODO: evaluator initialization
+	private final Interpreter evaluator;
 	private List<Player> players;
 	private List<Wizard> characters;
-	private int currentTurn;
+	private int current;
+	private Client display;
+	private volatile boolean gameOver;
 
-	public Arena(List<Player> participants, int first) {
+	public Arena(List<Player> participants, int first, Client display) {
+		evaluator = new Interpreter();
 		players = participants;
-		currentTurn = first;
+		current = first;
+		this.display = display;
+		gameOver = false;
 		characters = new ArrayList<>(participants.size());
 		for (Player p : participants)
-			characters.add(new Wizard(p.getName()));
-	}
-
-	public Expression makePlay(String code) {
-		return new VariableExpression(code); // @XXX: testing
+			characters.add(new Wizard(p.getName(), 0, 0)); // @TODO: game world
 	}
 
 	public boolean isLocalTurn() {
-		return currentTurn == 0;
+		return current == 0;
 	}
-	// @FIXME: arena should be able to change turns by itself
-	public void nextTurn() {
-		currentTurn = (currentTurn + 1) % characters.size();
+
+	public Expression makePlay(String code) {
+		try {
+			return evaluator.parse(code);
+		} catch (Exception e) {
+			display.notify(e.getMessage());
+		}
+		return null;
+	}
+
+	public void nextTurn() { // @TODO: game over condition
+		Player currentPlayer = players.get(current);
+		Expression play = currentPlayer.getNextPlay();
+		current = (current + 1) % players.size();
+		try {
+			evaluator.interpret(play);
+		} catch (Exception e) {
+			display.notify(
+				"Invalid play from " + currentPlayer.getName() +
+				": " + e.getMessage()
+			);
+		}
 	}
 
 }
