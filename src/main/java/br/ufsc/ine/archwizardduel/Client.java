@@ -30,4 +30,11 @@ interface Client {
 	 */
 	public void showMatch();
 
+	/**
+	 * Updates the game view with the given world grid.
+	 *
+	 * @param world array containing object types to be drawn at that position
+	 */
+	public void update(int[][] world);
+
 }

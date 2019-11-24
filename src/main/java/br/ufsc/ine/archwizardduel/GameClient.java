@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 /**
  * Graphical user interface.
  */
-public class GameClient extends JFrame implements Client { // @FIXME
+public class GameClient extends JFrame implements Client {
 
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
@@ -241,6 +241,11 @@ public class GameClient extends JFrame implements Client { // @FIXME
 		typeHere.setVisible(true);
 		updateScreen();
 		this.repaint();
+	}
+
+	@Override
+	public void update(int[][] world) {
+		// @TODO
 	}
 
 

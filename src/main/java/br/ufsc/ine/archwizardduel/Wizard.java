@@ -8,7 +8,7 @@ class Wizard {
 	private final String name;
 	private int health;
 	private int mana;
-	private double[] position;
+	private int[] position;
 
 	/**
 	 * Summons a Wizard with the given parameters.
@@ -17,11 +17,11 @@ class Wizard {
 	 * @param x    x initial position
 	 * @param y    y initial position
 	 */
-	public Wizard(String name, double x, double y) {
+	public Wizard(String name, int x, int y) {
 		this.name = name;
 		this.health = 100;
 		this.mana = 100;
-		position = new double[]{x, y};
+		position = new int[]{x, y};
 	}
 
 	/**
@@ -46,21 +46,21 @@ class Wizard {
 	}
 
 	/**
-	 * Gets the Wizard's current position as a normalized vector.
+	 * Gets the Wizard's current position vector.
 	 *
-	 * @return a double array containing coordinates {x, y}
+	 * @return an int array containing coordinates {x, y}
 	 */
-	public double[] position() {
+	public int[] position() {
 		return position;
 	}
 
 	/**
-	 * Moves the Wizard to a normalized position.
+	 * Moves the Wizard to another position.
 	 *
 	 * @param x x position
 	 * @param y y position
 	 */
-	public void move(double x, double y) {
+	public void move(int x, int y) {
 		position[0] = x;
 		position[1] = y;
 	}
