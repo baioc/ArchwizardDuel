@@ -9,14 +9,14 @@ class Arena {
 	private List<Player> players;
 	private List<Wizard> characters;
 	private int current;
-	private Client display;
+	private Client user;
 	private volatile boolean gameOver;
 
-	public Arena(List<Player> participants, int first, Client display) {
+	public Arena(List<Player> participants, int first, Client user) {
 		evaluator = new Interpreter();
 		players = participants;
 		current = first;
-		this.display = display;
+		this.user = user;
 		gameOver = false;
 		characters = new ArrayList<>(participants.size());
 		for (Player p : participants)
@@ -31,7 +31,7 @@ class Arena {
 		try {
 			return evaluator.parse(code);
 		} catch (Exception e) {
-			display.notify(e.getMessage());
+			user.notify(e.getMessage());
 		}
 		return null;
 	}
@@ -43,7 +43,7 @@ class Arena {
 		try {
 			evaluator.interpret(play);
 		} catch (Exception e) {
-			display.notify(
+			user.notify(
 				"Invalid play from " + currentPlayer.getName() +
 				": " + e.getMessage()
 			);
