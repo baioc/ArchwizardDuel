@@ -8,7 +8,10 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
 
-public class Client extends JFrame {
+/**
+ * Graphical user interface.
+ */
+public class Client extends JFrame { // @FIXME
 
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
@@ -74,6 +77,12 @@ public class Client extends JFrame {
 
 	/*************************** PUBLIC INTERFACE *****************************/
 
+	/**
+	 * Builds a Client and sets its reference to the game server. This
+	 * constructor may create user interactions in order to configure itself.
+	 *
+	 * @param server injected server dependency
+	 */
 	public Client(Server server) {
 		super("Archwizard Duel");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,8 +90,15 @@ public class Client extends JFrame {
 		setSize(WIDTH, HEIGHT);
 		setVisible(true);
 
+		String username = null;
+		do {
+			username = JOptionPane.showInputDialog(
+				this, "Please enter a valid username:"
+			);
+		} while (username == null);
+
+		player = new Player(username);
 		network = server;
-		player = new Player(JOptionPane.showInputDialog(this, "Please enter a valid username:"));
 
 		final int width = 200;
 		final int height = 30;
@@ -179,8 +195,13 @@ public class Client extends JFrame {
 		return player;
 	}
 
+	/**
+	 * Notifies the user of some event.
+	 */
 	public void showMessage(String msg) {
-		JOptionPane.showMessageDialog(this, msg, "Notification", JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(
+			this, msg, "Notification", JOptionPane.PLAIN_MESSAGE
+		);
 	}
 
 	private void deselectScreen() {
@@ -233,6 +254,9 @@ public class Client extends JFrame {
 		}
 	}
 
+	/**
+	 * Shows the initial GUI configuration.
+	 */
 	public void showBegin() {
 		connection = null;
 		deselectScreen();
@@ -247,6 +271,9 @@ public class Client extends JFrame {
 		this.repaint();
 	}
 
+	/**
+	 * Shows the currently active session.
+	 */
 	public void showSession() {
 		deselectScreen();
 		hostButton.setVisible(false);
@@ -260,6 +287,9 @@ public class Client extends JFrame {
 		this.repaint();
 	}
 
+	/**
+	 * Shows the current running match.
+	 */
 	public void showMatch() {
 		hostButton.setVisible(false);
 		connectButton.setVisible(false);
@@ -286,7 +316,7 @@ public class Client extends JFrame {
 			this,
 			"Enter IP address of session to be joined:"
 		);
-		if ((connection = network.joinSession(this, ip)) != null)
+		if (ip != null && (connection = network.joinSession(this, ip)) != null)
 			showSession();
 	}
 

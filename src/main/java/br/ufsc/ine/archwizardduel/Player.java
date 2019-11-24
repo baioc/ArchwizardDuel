@@ -1,5 +1,8 @@
 package br.ufsc.ine.archwizardduel;
 
+/**
+ * Class used to represent dueling players.
+ */
 public class Player {
 
 	final String userName;
@@ -14,22 +17,29 @@ public class Player {
 		return userName;
 	}
 
+	/**
+	 * Produces this player's next play.
+	 *
+	 * @param code actual play, should never be null
+	 */
 	public synchronized void setNextPlay(Expression code) {
 		play = code;
 		notify();
 	}
 
+	/**
+	 * Consumes this player's next play, waiting if there isn't one.
+	 */
 	public synchronized Expression getNextPlay() {
 		try {
 			while (play == null)
 				wait();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} finally {
-			final Expression inbox = play;
-			play = null;
-			return inbox;
 		}
+		final Expression inbox = play;
+		play = null;
+		return inbox;
 	}
 
 }

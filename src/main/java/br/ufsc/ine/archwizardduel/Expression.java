@@ -1,25 +1,22 @@
 package br.ufsc.ine.archwizardduel;
 
 import br.ufsc.inf.leobr.cliente.Jogada;
-import java.util.List;
 
-class Expression implements Jogada { // @TODO
+/**
+ * Provides the functional interface of all Lisp-like expressions.
+ */
+public interface Expression extends Jogada {
 
-	private final List<Expression> subexpressions;
-	private final String token;
-
-	public Expression(String token) {
-		subexpressions = null;
-		this.token = token;
-	}
-	// @XXX: testing
-	@Override
-	public String toString() {
-		return token;
-	}
-
-	public Value evaluate(Environment env) {
-		return null;
-	}
+	/**
+	 * Evaluates the expression with respect to a given environment.
+	 *
+	 * @param  env environment used during evaluation
+	 * @return     the value resulting from this expression's evaluation
+	 * @throws Exception if at any point during evaluation a runtime error takes
+	 * place; possibilities include calling a procedure with an incorrect number
+	 * of arguments, arithmetic exceptions such as division by zero, using
+	 * undeclared variables or applying operations to unsupported types
+	 */
+	public Value evaluate(Environment env) throws Exception;
 
 }

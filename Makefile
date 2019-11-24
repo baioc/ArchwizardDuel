@@ -5,7 +5,7 @@ export BUILDER = mvn
 export LIBDIR  = $(CURDIR)/lib
 export TARGDIR = $(CURDIR)/target
 
-all:
+run:
 	$(MAKE) kill ; $(MAKE) clean
 	$(BUILDER) package
 	cd $(LIBDIR) && $(MAKE) run
