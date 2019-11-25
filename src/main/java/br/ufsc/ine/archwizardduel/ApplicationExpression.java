@@ -49,7 +49,7 @@ public class ApplicationExpression implements Expression {
 			return proc.apply(arguments);
 		} catch (RuntimeException e) {
 			throw new Exception(
-				"Evaluation error during procedure application: " +
+				"Evaluation error during procedure application: \n" +
 				e.getMessage()
 			);
 		}

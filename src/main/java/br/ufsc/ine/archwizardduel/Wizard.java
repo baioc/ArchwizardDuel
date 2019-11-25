@@ -9,6 +9,9 @@ class Wizard {
 	private int health;
 	private int mana;
 	private int[] position;
+	private Direction rotation;
+
+	public static enum Direction { UP, LEFT, DOWN, RIGHT }
 
 	/**
 	 * Summons a Wizard with the given parameters.
@@ -17,11 +20,12 @@ class Wizard {
 	 * @param x    x initial position
 	 * @param y    y initial position
 	 */
-	public Wizard(String name, int x, int y) {
+	public Wizard(String name) {
 		this.name = name;
 		this.health = 100;
 		this.mana = 100;
-		position = new int[]{x, y};
+		position = new int[]{0, 0};
+		rotation = Direction.DOWN;
 	}
 
 	/**
@@ -32,6 +36,15 @@ class Wizard {
 	}
 
 	/**
+	 * Whether or not this Wizard is dead.
+	 *
+	 * @return true when he is, false otherwise
+	 */
+	public boolean isDead() {
+		return health <= 0;
+	}
+
+	/**
 	 * Gets Wizard's current health resource.
 	 */
 	public int health() {
@@ -39,10 +52,39 @@ class Wizard {
 	}
 
 	/**
+	 * This Wizard takes damage, losing some life.
+	 *
+	 * @param damage damage to be taken
+	 */
+	public void damage(int damage) {
+		health = Math.max(0, health - damage);
+	}
+
+	/**
 	 * Gets Wizard's current mana resource.
 	 */
 	public int mana() {
 		return mana;
+	}
+
+	/**
+	 * Spends some of the magic resources.
+	 *
+	 * @param mp      mana spent
+	 * @throws throws RuntimeException when there's no sufficient mana
+	 */
+	public void spend(int mp) throws RuntimeException {
+		if (mana < mp)
+			throw new RuntimeException("ran out of mana.");
+		else
+			mana = Math.max(0, mana - mp);
+	}
+
+	/**
+	 * Regenerates all of this Wizard's mana.
+	 */
+	public void restore() {
+		mana = 100;
 	}
 
 	/**
@@ -66,39 +108,19 @@ class Wizard {
 	}
 
 	/**
-	 * This Wizard takes damage, losing some life.
+	 * Gets the Wizard's current facing direction.
 	 *
-	 * @param damage damage to be taken
+	 * @return Direction enum.
 	 */
-	public void damage(int damage) {
-		health = Math.max(0, health - damage);
+	public Direction rotation() {
+		return rotation;
 	}
 
 	/**
-	 * Whether or not this Wizard is dead.
-	 *
-	 * @return true when he is, false otherwise
+	 * Rotates the Wizard so it faces the given direction.
 	 */
-	public boolean isDead() {
-		return health <= 0;
-	}
-
-	/**
-	 * Spends some of the magic resources.
-	 *
-	 * @param mp mana spent
-	 */
-	public void spend(int mp) {
-		mana = Math.max(0, mana - mp);
-	}
-
-	/**
-	 * Regenerates some mana.
-	 *
-	 * @param mp mana points to be restored
-	 */
-	public void restore(int mp) {
-		mana = Math.min(100, mana + mp);
+	public void rotate(Direction dir) {
+		rotation = dir;
 	}
 
 }
