@@ -1,12 +1,17 @@
 # Archwizard Duel
 
-O [Projeto da disciplina INE5417](https://www.inf.ufsc.br/~ricardo.silva/INE5417e5608/) (Engenharia de Software I) consiste em um jogo multijogador distribuído desenvolvido em Java através de modelagem orientada a objetos em UML 2 e utilizando a biblioteca [NetGamesNRT](http://www.labsoft.ufsc.br/~netgames/NetGamesNRT).
+O [projeto da disciplina INE5417](https://www.inf.ufsc.br/~ricardo.silva/INE5417e5608/) (Engenharia de Software I) consiste em um jogo multijogador distribuído desenvolvido em Java através de modelagem orientada a objetos em UML 2 e utilizando a biblioteca [NetGamesNRT](http://www.labsoft.ufsc.br/~netgames/NetGamesNRT).
+
+**Utilizado como desculpa para produzir um software extensível via linguagem de *scripting* com interpretador próprio.**
+
 
 ## Sobre
 
 Em **Archwizard Duel**, cada jogador tem ao seu controle um mago com o qual deve provar seu valor ao vencer **duelos PvP**.
 O combate acontece **em turnos**, cada um consistindo na simulação de um intervalo de tempo em uma arena.
 As ações dos magos são **programadas por código** escrito pelos jogadores em uma linguagem específica.
+
+![prototipo](doc/gui.png)
 
 Jogos com ideias semelhantes e seus respectivos estilos de controles programáticos:
 
@@ -19,8 +24,9 @@ Jogos com ideias semelhantes e seus respectivos estilos de controles programáti
 Implementaremos uma pequena linguagem Lisp, isso facilitará parsing e interpretação.
 Referências na literatura:
 
-- [Bytecode Pattern - Nystrom, Game Programming Patterns](http://gameprogrammingpatterns.com/bytecode.html)
 - [Circular Evaluator - Abelson & Sussman, Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html)
+- [Bytecode Pattern - Nystrom, Game Programming Patterns](http://gameprogrammingpatterns.com/bytecode.html)
+
 
 ## Desenvolvimento
 
@@ -33,6 +39,6 @@ Referências na literatura:
 
 ### [Documentação](doc/)
 
-- [Especificação de Requisitos](doc/Requirements-Analysis.md)
+- [Especificação de Requisitos](doc/Requisitos.pdf)
 - [Guia para *workflow* com Git](doc/git-style.md)
 - [Padrões de estilo de código Java](doc/coding-style.md)

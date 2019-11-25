@@ -51,7 +51,7 @@ class Arena {
 		primitives.define("RIGHT",
 			new Value(Value.Type.NUMBER, Wizard.Direction.RIGHT)
 		);
-		primitives.define("turn",
+		primitives.define("turn!",
 			new Value(args -> {
 				characters.get(current).spend(5);
 				Wizard.Direction dir = (Wizard.Direction) args.get(0).value();
@@ -60,8 +60,8 @@ class Arena {
 				return nil;
 			}
 		));
-		primitives.define("step", new Value(args -> step()));
-		primitives.define("fireball", new Value(args -> fireball()));
+		primitives.define("step!", new Value(args -> step()));
+		primitives.define("fireball!", new Value(args -> fireball()));
 		primitives.define("blocked?", new Value(args -> isBlocked()));
 		primitives.define("mana",
 			new Value(args -> {

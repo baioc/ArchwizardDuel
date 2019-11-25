@@ -109,26 +109,28 @@ public class GameClient extends JFrame implements Client {
 			";; use ';' to comment the rest of a line\n" +
 			"\n" +
 			";; this is how a procedure definition goes\n" +
-			"(define foo (lambda (test dir)\n" +
+			"(define foo! (lambda (test dir)\n" +
 			"  (if (test)\n" +
-			"      (step) ; takes a step forward\n" +
-			"      (turn dir))))\n" +
+			"      (step!) ; takes a step forward\n" +
+			"      (turn! dir))))\n" +
 			"\n" +
 			";; first-order functions are availables\n" +
-			"(foo (lambda () (not (blocked?))) RIGHT)\n" +
+			"(foo!\n" +
+			"  (lambda () (not (blocked?))) ; tests if there is the path forward is clear\n" +
+			"  RIGHT)\n" +
 			"\n" +
 			";; some basic arithmetic operations are provided\n" +
 			"(if (= (+ 1 1) 3)\n" +
 			"    (begin\n" +
-			"      (turn UP) ; faces upwards, other options are LEFT, DOWN & RIGHT\n" +
-			"      (step))\n" +
-			"    (fireball)) ; throws a fireball at the currently facing direction\n" +
+			"      (turn! UP) ; faces upwards, other options are LEFT, DOWN & RIGHT\n" +
+			"      (step!))\n" +
+			"    (fireball!)) ; throws a fireball at the currently facing direction\n" +
 			"\n" +
 			";; infinite loop, but will halt when mana is depleted\n" +
-			"(define forward (lambda ()\n" +
-			"  (step)\n" +
-			"  (forward)))\n" +
-			"(forward)\n" +
+			"(define go! (lambda ()\n" +
+			"  (step!)\n" +
+			"  (go!)))\n" +
+			"(go!)\n" +
 			"\n" +
 			";; read the magic API for more tips\n" +
 			";; and remember to check your parenthesis\n" +
