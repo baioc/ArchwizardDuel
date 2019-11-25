@@ -88,8 +88,8 @@ class GameSession implements Session {
 			final Expression play = match.makePlay(code);
 			if (play != null) {
 				localPlayer.setNextPlay(play);
-				server.send(new SerializedExpression(play));
 				match.nextTurn();
+				server.send(new SerializedExpression(play));
 			}
 		}
 	}

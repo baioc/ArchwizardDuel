@@ -109,7 +109,6 @@ public class GameServer implements Server, OuvidorProxy {
 	public void send(SerializedExpression play) {
 		try {
 			proxy.enviaJogada((Jogada) play);
-			user.notify("Sent play!");
 		} catch (NaoJogandoException e) {
 			e.printStackTrace();
 		}
@@ -147,7 +146,6 @@ public class GameServer implements Server, OuvidorProxy {
 	@Override
 	public void receberJogada(Jogada jogada) {
 		final SerializedExpression play = (SerializedExpression) jogada;
-		user.notify("Received play!");
 		connection.pull(play);
 	}
 

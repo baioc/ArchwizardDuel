@@ -20,11 +20,11 @@ class Wizard {
 	 * @param x    x initial position
 	 * @param y    y initial position
 	 */
-	public Wizard(String name, int x, int y) {
+	public Wizard(String name) {
 		this.name = name;
 		this.health = 100;
 		this.mana = 100;
-		position = new int[]{x, y};
+		position = new int[]{0, 0};
 		rotation = Direction.DOWN;
 	}
 

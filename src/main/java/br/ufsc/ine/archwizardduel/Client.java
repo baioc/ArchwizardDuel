@@ -35,6 +35,6 @@ interface Client {
 	 *
 	 * @param world array containing object types to be drawn at that position
 	 */
-	public void update(GameObject[][] world);
+	public void redraw(GameObject[][] world);
 
 }
