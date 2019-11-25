@@ -17,7 +17,7 @@ class Arena {
 	private List<Player> players;
 	private int current;
 	private Client gui;
-	private List<Spell> spells;
+	private List<Fireball> spells;
 
 	/**
 	 * Builds an arena, effectively starting a match with the given parameters.
@@ -53,68 +53,33 @@ class Arena {
 		);
 		primitives.define("turn",
 			new Value(args -> {
+				characters.get(current).spend(5);
 				Wizard.Direction dir = (Wizard.Direction) args.get(0).value();
 				characters.get(current).rotate(dir);
 				update();
 				return nil;
 			}
 		));
-		primitives.define("step",
+		primitives.define("step", new Value(args -> step()));
+		primitives.define("fireball", new Value(args -> fireball()));
+		primitives.define("blocked?", new Value(args -> isBlocked()));
+		primitives.define("mana",
 			new Value(args -> {
-				Wizard mage = characters.get(current);
-				final int oldX = mage.position()[0];
-				final int oldY = mage.position()[1];
-				int x = oldX;
-				int y = oldY;
-				switch (mage.rotation()) {
-					case UP:
-						y = Math.max(0, oldY - 1);
-						break;
-					case LEFT:
-						x = Math.max(0, oldX - 1);
-						break;
-					case DOWN:
-						y = Math.min(map.length - 1, oldY + 1);
-						break;
-					case RIGHT:
-						x = Math.min(map[oldY].length - 1, oldX + 1);
-						break;
-				}
-				GameObject.Type type = map[y][x].type();
-				Object object = map[y][x].object();
-				if (type == GameObject.Type.EMPTY) {
-					mage.move(x, y);
-					map[oldY][oldX].set(type, object);
-					map[y][x].set(GameObject.Type.WIZARD, mage);
-				}
-				update();
-				return nil;
-			}
-		));
-		primitives.define("fireball",
-			new Value(args -> {
-				Wizard mage = characters.get(current);
-				Spell fireball = new Spell(
-					mage,
-					mage.position()[0],
-					mage.position()[1],
-					mage.rotation()
+				return new Value(
+					Value.Type.NUMBER,
+					new BigDecimal(characters.get(current).mana())
 				);
-				update();
-				fireball.move();
-				final int x = fireball.position()[0];
-				final int y = fireball.position()[1];
-				if (y >= 0 && y < map.length &&
-				    x >= 0 && x < map[y].length &&
-				    map[y][x].type() == GameObject.Type.EMPTY
-				) {
-					map[y][x].set(GameObject.Type.FIREBALL, fireball);
-					spells.add(fireball);
-				}
-				return nil;
 			}
 		));
-		evaluator = new Interpreter(primitives); // @TODO: mana usage
+		primitives.define("health",
+			new Value(args -> {
+				return new Value(
+					Value.Type.NUMBER,
+					new BigDecimal(characters.get(current).health())
+				);
+			}
+		));
+		evaluator = new Interpreter(primitives);
 
 		map = new GameObject[3][15];
 		for (int i = 0; i < map.length; ++i) {
@@ -199,6 +164,92 @@ class Arena {
 	}
 
 
+	private Value step() {
+		characters.get(current).spend(10);
+
+		Wizard mage = characters.get(current);
+
+		final int oldX = mage.position()[0];
+		final int oldY = mage.position()[1];
+		int x = oldX;
+		int y = oldY;
+		switch (mage.rotation()) {
+			case UP:
+				y = Math.max(0, oldY - 1);
+				break;
+			case LEFT:
+				x = Math.max(0, oldX - 1);
+				break;
+			case DOWN:
+				y = Math.min(map.length - 1, oldY + 1);
+				break;
+			case RIGHT:
+				x = Math.min(map[oldY].length - 1, oldX + 1);
+				break;
+		}
+
+		GameObject.Type type = map[y][x].type();
+		Object object = map[y][x].object();
+		if (type == GameObject.Type.EMPTY) {
+			mage.move(x, y);
+			map[oldY][oldX].set(type, object);
+			map[y][x].set(GameObject.Type.WIZARD, mage);
+		}
+
+		update();
+		return nil;
+	}
+
+	private Value fireball() {
+		characters.get(current).spend(30);
+
+		Wizard mage = characters.get(current);
+		Fireball fireball = new Fireball(
+			mage,
+			mage.position()[0],
+			mage.position()[1],
+			mage.rotation()
+		);
+
+		spells.add(fireball);
+		update();
+
+		return nil;
+	}
+
+	private Value isBlocked() {
+		Wizard mage = characters.get(current);
+
+		final int oldX = mage.position()[0];
+		final int oldY = mage.position()[1];
+		int x = oldX;
+		int y = oldY;
+		switch (mage.rotation()) {
+			case UP:
+				y = oldY - 1;
+				break;
+			case LEFT:
+				x = oldX - 1;
+				break;
+			case DOWN:
+				y = oldY + 1;
+				break;
+			case RIGHT:
+				x = oldX + 1;
+				break;
+		}
+
+		return new Value(
+			Value.Type.BOOLEAN,
+			new Boolean(
+				y < 0 || y >= map.length ||
+				x < 0 || x >= map[y].length ||
+				map[y][x].type() == GameObject.Type.ROCK ||
+				map[y][x].type() == GameObject.Type.WIZARD
+			)
+		);
+	}
+
 	private void update() {
 		spells.removeIf(s -> {
 			final int oldX = s.position()[0];
@@ -208,24 +259,27 @@ class Arena {
 			final int y = s.position()[1];
 
 			if (y < 0 || y >= map.length || x < 0 || x >= map[y].length) {
-				map[oldY][oldX].set(GameObject.Type.EMPTY, null);
+				if (map[oldY][oldX].type() == GameObject.Type.FIREBALL)
+					map[oldY][oldX].set(GameObject.Type.EMPTY, null);
 				return true;
 			}
 
 			GameObject.Type type = map[y][x].type();
 			Object object = map[y][x].object();
 			if (type == GameObject.Type.EMPTY) {
-				map[oldY][oldX].set(type, object);
 				map[y][x].set(GameObject.Type.FIREBALL, s);
+				if (map[oldY][oldX].type() == GameObject.Type.FIREBALL)
+					map[oldY][oldX].set(type, object);
 				return false;
 
 			} else {
 				if (type == GameObject.Type.WIZARD &&
-					!((Wizard) object).name().equals(s.caster().name())
+				    !((Wizard) object).name().equals(s.caster().name())
 				) {
-					((Wizard) object).damage(20);
+				 	((Wizard) object).damage(20);
 				}
-				map[oldY][oldX].set(GameObject.Type.EMPTY, null);
+				if (map[oldY][oldX].type() == GameObject.Type.FIREBALL)
+					map[oldY][oldX].set(GameObject.Type.EMPTY, null);
 				return true;
 			}
 		});

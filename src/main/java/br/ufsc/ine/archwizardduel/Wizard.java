@@ -70,10 +70,14 @@ class Wizard {
 	/**
 	 * Spends some of the magic resources.
 	 *
-	 * @param mp mana spent
+	 * @param mp      mana spent
+	 * @throws throws RuntimeException when there's no sufficient mana
 	 */
-	public void spend(int mp) {
-		mana = Math.max(0, mana - mp);
+	public void spend(int mp) throws RuntimeException {
+		if (mana < mp)
+			throw new RuntimeException("ran out of mana.");
+		else
+			mana = Math.max(0, mana - mp);
 	}
 
 	/**

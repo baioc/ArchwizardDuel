@@ -105,7 +105,35 @@ public class GameClient extends JFrame implements Client {
 		playButton.setBounds(rightAligned, bottom, buttonWidth, buttonHeight);
 		this.add(playButton);
 
-		typeHere = new JTextArea();
+		typeHere = new JTextArea(
+			";; use ';' to comment the rest of a line\n" +
+			"\n" +
+			";; this is how a procedure definition goes\n" +
+			"(define foo (lambda (test dir)\n" +
+			"  (if (test)\n" +
+			"      (step) ; takes a step forward\n" +
+			"      (turn dir))))\n" +
+			"\n" +
+			";; first-order functions are availables\n" +
+			"(foo (lambda () (not (blocked?))) RIGHT)\n" +
+			"\n" +
+			";; some basic arithmetic operations are provided\n" +
+			"(if (= (+ 1 1) 3)\n" +
+			"    (begin\n" +
+			"      (turn UP) ; faces upwards, other options are LEFT, DOWN & RIGHT\n" +
+			"      (step))\n" +
+			"    (fireball)) ; throws a fireball at the currently facing direction\n" +
+			"\n" +
+			";; infinite loop, but will halt when mana is depleted\n" +
+			"(define forward (lambda ()\n" +
+			"  (step)\n" +
+			"  (forward)))\n" +
+			"(forward)\n" +
+			"\n" +
+			";; read the magic API for more tips\n" +
+			";; and remember to check your parenthesis\n" +
+			";; ... also make sure to leave a blank line in the end of your code\n"
+		);
 		textArea = new JScrollPane(typeHere);
 		textArea.setBounds(leftAligned, HEIGHT/2, WIDTH - 2*spacing, HEIGHT/3);
 		this.add(textArea);
@@ -286,7 +314,8 @@ public class GameClient extends JFrame implements Client {
 				map[i][j].setIcon(updated);
 			}
 		}
-		this.repaint();
+
+		paintComponents(getGraphics()); // @XXX: forces an immediate repaint
 	}
 
 
