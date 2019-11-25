@@ -18,28 +18,17 @@ public class Player {
 	}
 
 	/**
-	 * Produces this player's next play.
-	 *
-	 * @param code actual play, should never be null
+	 * Sets this player's next play.
 	 */
-	public synchronized void setNextPlay(Expression code) {
+	public void setNextPlay(Expression code) {
 		play = code;
-		notify();
 	}
 
 	/**
-	 * Consumes this player's next play, waiting if there isn't one.
+	 * Gets this player's next play.
 	 */
-	public synchronized Expression getNextPlay() {
-		try {
-			while (play == null)
-				wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		final Expression inbox = play;
-		play = null;
-		return inbox;
+	public Expression getNextPlay() {
+		return play;
 	}
 
 }

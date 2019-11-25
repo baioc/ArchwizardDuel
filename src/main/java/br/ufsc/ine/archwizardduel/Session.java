@@ -18,7 +18,10 @@ interface Session {
 	public void quitMatch();
 
 	/**
-	 * Sends a play which will only be accepted if it is the local user's turn.
+	 * Sends a local play to the running match. This shall only be accepted if
+	 * it is the local user's turn and it is a valid play.
+	 *
+	 * @param code unvalidated play from local player
 	 */
 	public void push(String code);
 

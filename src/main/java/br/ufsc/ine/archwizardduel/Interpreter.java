@@ -221,9 +221,9 @@ class Interpreter {
 		List<Token> tokens = new LinkedList<>();
 
 		String[] input = code.split("\n");
-		for (int i = 0; i < input.length; i++) {
+		for (int i = 0; i < input.length; ++i) {
 			String line = input[i];
-			for (int begin = 0; begin < line.length(); begin++) {
+			for (int begin = 0; begin < line.length(); ++begin) {
 				char ch = line.charAt(begin);
 				if (Character.isWhitespace(ch)) {
 					continue;
@@ -235,7 +235,7 @@ class Interpreter {
 					tokens.add(new Token(Token.Type.RPAREN, ")", i+1));
 				} else {
 					int end = begin + 1;
-					for (; end < line.length(); end++) {
+					for (; end < line.length(); ++end) {
 						char curr = line.charAt(end);
 						if (Character.isWhitespace(curr) || curr == ')' || curr == ';')
 							break;

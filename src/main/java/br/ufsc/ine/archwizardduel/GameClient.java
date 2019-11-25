@@ -1,5 +1,7 @@
 package br.ufsc.ine.archwizardduel;
 
+import br.ufsc.ine.archwizardduel.GameObject;
+import br.ufsc.ine.archwizardduel.Wizard;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
@@ -7,11 +9,16 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
+import java.awt.Image;
 
 /**
  * Graphical user interface.
  */
 public class GameClient extends JFrame implements Client {
+
+	private final Player player;
+	private final Server network;
+	private Session connection;
 
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
@@ -24,51 +31,14 @@ public class GameClient extends JFrame implements Client {
 	private JButton playButton;
 	private JScrollPane textArea;
 	private JTextArea typeHere;
-
-	private final Player player;
-	private final Server network;
-	private Session connection;
-
-	/*
-		0 = Blank Tile
-		1 = You
-		2 = Second player
-		3 = P1 throws fire
-		4 = P2 throws fire
-	*/
-	private int LEVEL_WIDTH = 15;
-	private int LEVEL_HEIGHT = 3;
-	private int level[][] = new int[LEVEL_HEIGHT][LEVEL_WIDTH];
-
-	/*
-		TILES:
-
-		wizard:
-		[X] [] [] [] []
-		[X] [] [] [] []
-		[X] [] [] [] []
-		ou
-		[] [] [] [] [X]
-		[] [] [] [] [X]
-		[] [] [] [] [X]
-
-		blank:
-		[X] [X] [X] [X] [X]
-		[X] [X] [X] [X] [X]
-		[X] [X] [X] [X] [X]
-
-		weapon:
-		[] [X] [X] [X] []
-		[] [X] [X] [X] []
-		[] [X] [X] [X] []
-
-	*/
-	private JLabel wizardOne[] = new JLabel[LEVEL_HEIGHT];
-	private JLabel wizardTwo[] = new JLabel[LEVEL_HEIGHT];
-	private JLabel ground[][] = new JLabel[LEVEL_HEIGHT][LEVEL_WIDTH];
-	private JLabel fireOne[][] = new JLabel[LEVEL_HEIGHT][LEVEL_WIDTH - 2];
-	private JLabel fireTwo[][] = new JLabel[LEVEL_HEIGHT][LEVEL_WIDTH - 2];
-
+	private JLabel[][] map;
+	private ImageIcon ground;
+	private ImageIcon rock;
+	private ImageIcon fireball;
+	private ImageIcon wizardUp;
+	private ImageIcon wizardLeft;
+	private ImageIcon wizardDown;
+	private ImageIcon wizardRight;
 	private JLabel status;
 
 
@@ -76,7 +46,7 @@ public class GameClient extends JFrame implements Client {
 
 	/**
 	 * Builds a Client and sets its reference to the game server. This
-	 * constructor may create user interactions in order to configure itself.
+	 * constructor may make user interactions in order to configure itself.
 	 *
 	 * @param server injected server dependency
 	 */
@@ -84,6 +54,7 @@ public class GameClient extends JFrame implements Client {
 		super("Archwizard Duel");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
+		setResizable(false);
 		setSize(WIDTH, HEIGHT);
 		setVisible(true);
 
@@ -97,94 +68,149 @@ public class GameClient extends JFrame implements Client {
 		player = new Player(username);
 		network = server;
 
-		final int width = 200;
+		final int buttonWidth = 200;
+		final int buttonHeight = 30;
+		final int spacing = 40;
+		final int rightAligned = WIDTH - buttonWidth - spacing;
+		final int leftAligned = spacing;
+		final int bottom = HEIGHT - 2*spacing;
 
-		final int height = 30;
 		hostButton = new JButton("Create Session");
 		hostButton.addActionListener(e -> makeSession());
-		hostButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
-
+		hostButton.setBounds(rightAligned, bottom, buttonWidth, buttonHeight);
 		this.add(hostButton);
+
 		connectButton = new JButton("Join Session");
 		connectButton.addActionListener(e -> joinSession());
-		connectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
-
+		connectButton.setBounds(leftAligned, bottom, buttonWidth, buttonHeight);
 		this.add(connectButton);
+
 		disconnectButton = new JButton("Quit Session");
 		disconnectButton.addActionListener(e -> leaveSession());
-		disconnectButton.setBounds(WIDTH*0, HEIGHT - 2*height, width, height);
+		disconnectButton.setBounds(leftAligned, bottom, buttonWidth, buttonHeight);
 		this.add(disconnectButton);
 
 		startGame = new JButton("Start Match");
 		startGame.addActionListener(e -> startMatch());
-		startGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
+		startGame.setBounds(rightAligned, bottom, buttonWidth, buttonHeight);
 		this.add(startGame);
 
 		exitGame = new JButton("Quit Match");
 		exitGame.addActionListener(e -> quitMatch());
-		exitGame.setBounds(WIDTH/3, HEIGHT - 2*height, width, height);
+		exitGame.setBounds(leftAligned, bottom, buttonWidth, buttonHeight);
 		this.add(exitGame);
 
 		playButton = new JButton("Send Play");
 		playButton.addActionListener(e -> play());
-		playButton.setBounds(WIDTH - width, HEIGHT - 2*height, width, height);
+		playButton.setBounds(rightAligned, bottom, buttonWidth, buttonHeight);
 		this.add(playButton);
 
-		typeHere = new JTextArea();
+		typeHere = new JTextArea(
+			";; use ';' to comment the rest of a line\n" +
+			"\n" +
+			";; this is how a procedure definition goes\n" +
+			"(define foo! (lambda (test dir)\n" +
+			"  (if (test)\n" +
+			"      (step!) ; takes a step forward\n" +
+			"      (turn! dir))))\n" +
+			"\n" +
+			";; first-order functions are availables\n" +
+			"(foo!\n" +
+			"  (lambda () (not (blocked?))) ; tests if there is the path forward is clear\n" +
+			"  RIGHT)\n" +
+			"\n" +
+			";; some basic arithmetic operations are provided\n" +
+			"(if (= (+ 1 1) 3)\n" +
+			"    (begin\n" +
+			"      (turn! UP) ; faces upwards, other options are LEFT, DOWN & RIGHT\n" +
+			"      (step!))\n" +
+			"    (fireball!)) ; throws a fireball at the currently facing direction\n" +
+			"\n" +
+			";; infinite loop, but will halt when mana is depleted\n" +
+			"(define go! (lambda ()\n" +
+			"  (step!)\n" +
+			"  (go!)))\n" +
+			"(go!)\n" +
+			"\n" +
+			";; read the magic API for more tips\n" +
+			";; and remember to check your parenthesis\n" +
+			";; ... also make sure to leave a blank line in the end of your code\n"
+		);
 		textArea = new JScrollPane(typeHere);
-		textArea.setBounds(0*WIDTH, HEIGHT/2, WIDTH, HEIGHT/3);
+		textArea.setBounds(leftAligned, HEIGHT/2, WIDTH - 2*spacing, HEIGHT/3);
 		this.add(textArea);
 
-		level[1][0] = 1; // PLAYER 1 INITIAL POSITION
-		level[1][LEVEL_WIDTH - 1] = 2; // PLAYER 2 INITIAL POSITION
+		map = new JLabel[3][15];
+		final int tileWidth = 48;
+		final int tileHeight = 66;
 
-		// TEST FIRES
-		level[1][10] = 3;
-		level[0][3] = 4;
+		ground = new ImageIcon(
+			getClass().getClassLoader().getResource("ground.png")
+		);
+		ground = new ImageIcon(ground.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
 
-		int space = 40;
-		int th = 66;
-		int tw = 48;
+		rock = new ImageIcon(
+			getClass().getClassLoader().getResource("rock.png")
+		);
+		rock = new ImageIcon(rock.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
 
-		// I NEED TO KNOW IF I'M P1 OR P2
+		fireball = new ImageIcon(
+			getClass().getClassLoader().getResource("fireball.png")
+		);
+		fireball = new ImageIcon(fireball.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
 
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			for (int j = 0; j < LEVEL_WIDTH; ++j) {
-				ground[i][j] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("ground.jpg")));
-				ground[i][j].setBounds(space + j * tw, i * th, tw, th);
-				this.add(ground[i][j]);
-				ground[i][j].setVisible(false);
+		wizardUp = new ImageIcon(
+			getClass().getClassLoader().getResource("up.png")
+		);
+		wizardUp = new ImageIcon(wizardUp.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
+
+		wizardLeft = new ImageIcon(
+			getClass().getClassLoader().getResource("left.png")
+		);
+		wizardLeft = new ImageIcon(wizardLeft.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
+
+		wizardDown = new ImageIcon(
+			getClass().getClassLoader().getResource("down.png")
+		);
+		wizardDown = new ImageIcon(wizardDown.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
+
+		wizardRight = new ImageIcon(
+			getClass().getClassLoader().getResource("right.png")
+		);
+		wizardRight = new ImageIcon(wizardRight.getImage().getScaledInstance(
+			tileWidth, tileHeight, Image.SCALE_DEFAULT
+		));
+
+		for (int i = 0; i < map.length; ++i) {
+			for (int j = 0; j < map[i].length; ++j) {
+				map[i][j] = new JLabel();
+				map[i][j].setBounds(
+					spacing + j*tileWidth,
+					buttonHeight + i*tileHeight,
+					tileWidth,
+					tileHeight
+				);
+				map[i][j].setIcon(ground);
+				this.add(map[i][j]);
 			}
 		}
 
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			wizardOne[i] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("player1.jpg")));
-			wizardTwo[i] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("player2.jpg")));
-			wizardOne[i].setBounds(space, i * th, tw, th);
-			wizardTwo[i].setBounds(space + (LEVEL_WIDTH - 1) * tw, i * th, tw, th);
-			this.add(wizardOne[i]);
-			this.add(wizardTwo[i]);
-			wizardOne[i].setVisible(false);
-			wizardTwo[i].setVisible(false);
-		}
-
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			for (int j = 0; j < LEVEL_WIDTH - 2; ++j) {
-				fireOne[i][j] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("weapon1.jpg")));
-				fireTwo[i][j] = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("weapon2.jpg")));
-				fireOne[i][j].setBounds(space + tw * (1 + j), th * i, tw, th);
-				fireTwo[i][j].setBounds(space + tw * (1 + j), th * i, tw, th);
-				this.add(fireOne[i][j]);
-				this.add(fireTwo[i][j]);
-				fireOne[i][j].setVisible(false);
-				fireTwo[i][j].setVisible(false);
-			}
-		}
-
-		status = new JLabel("Mana = 10000");
-		status.setBounds(300, 210, 100, 50);
+		status = new JLabel("");
+		status.setBounds(320, 240, 300, 50);
 		this.add(status);
-		status.setVisible(false);
+
 		showBegin();
 	}
 
@@ -203,7 +229,6 @@ public class GameClient extends JFrame implements Client {
 	@Override
 	public void showBegin() {
 		connection = null;
-		deselectScreen();
 		hostButton.setVisible(true);
 		connectButton.setVisible(true);
 		disconnectButton.setVisible(false);
@@ -212,12 +237,12 @@ public class GameClient extends JFrame implements Client {
 		playButton.setVisible(false);
 		textArea.setVisible(false);
 		typeHere.setVisible(false);
+		setMapVisible(false);
 		this.repaint();
 	}
 
 	@Override
 	public void showSession() {
-		deselectScreen();
 		hostButton.setVisible(false);
 		connectButton.setVisible(false);
 		disconnectButton.setVisible(true);
@@ -226,6 +251,7 @@ public class GameClient extends JFrame implements Client {
 		playButton.setVisible(false);
 		textArea.setVisible(false);
 		typeHere.setVisible(false);
+		setMapVisible(false);
 		this.repaint();
 	}
 
@@ -239,66 +265,69 @@ public class GameClient extends JFrame implements Client {
 		playButton.setVisible(true);
 		textArea.setVisible(true);
 		typeHere.setVisible(true);
-		updateScreen();
+		setMapVisible(true);
 		this.repaint();
 	}
 
 	@Override
-	public void update(int[][] world) {
-		// @TODO
+	public void redraw(GameObject[][] world) {
+		for (int i = 0; i < map.length; ++i) {
+			for (int j = 0; j < map[i].length; ++j) {
+				ImageIcon updated = null;
+
+				switch (world[i][j].type()) {
+					case WIZARD:
+						Wizard mage = (Wizard) world[i][j].object();
+						switch (mage.rotation()) {
+							case UP:
+								updated = wizardUp;
+								break;
+							case DOWN:
+								updated = wizardDown;
+								break;
+							case LEFT:
+								updated = wizardLeft;
+								break;
+							case RIGHT:
+								updated = wizardRight;
+								break;
+						}
+						if (mage.name().equals(player.getName())) {
+							status.setText(
+								"Health: " + mage.health() +
+								"    Mana: " + mage.mana()
+							);
+						}
+						break;
+
+					case FIREBALL:
+						updated = fireball;
+						break;
+
+					case ROCK:
+						updated = rock;
+						break;
+
+					case EMPTY:
+						updated = ground;
+						break;
+				}
+
+				map[i][j].setIcon(updated);
+			}
+		}
+
+		paintComponents(getGraphics()); // @XXX: forces an immediate repaint
 	}
 
 
 	/**************************** PRIVATE METHODS *****************************/
 
-	private void deselectScreen() {
-		status.setVisible(false);
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			for (int j = 0; j < LEVEL_WIDTH; ++j) {
-				ground[i][j].setVisible(false);
-			}
-		}
-
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			for (int j = 0; j < LEVEL_WIDTH - 2; ++j) {
-				fireOne[i][j].setVisible(false);
-				fireTwo[i][j].setVisible(false);
-			}
-		}
-
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			wizardOne[i].setVisible(false);
-			wizardTwo[i].setVisible(false);
-		}
-	}
-
-	private void updateScreen() {
-		status.setVisible(true);
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			for (int j = 0; j < LEVEL_WIDTH; ++j) {
-				if (level[i][j] == 0) {
-					ground[i][j].setVisible(true);
-				}
-			}
-		}
-
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			for (int j = 0; j < LEVEL_WIDTH - 2; ++j) {
-				if (level[i][j + 1] == 3) {
-					fireOne[i][j].setVisible(true);
-				} if (level[i][j + 1] == 4) {
-					fireTwo[i][j].setVisible(true);
-				}
-			}
-		}
-
-		for (int i = 0; i < LEVEL_HEIGHT; ++i) {
-			if (level[i][0] == 1) {
-				wizardOne[i].setVisible(true);
-			} if (level[i][LEVEL_WIDTH - 1] == 2) {
-				wizardTwo[i].setVisible(true);
-			}
-		}
+	private void setMapVisible(boolean visible) {
+		status.setVisible(visible);
+		for (int i = 0; i < map.length; ++i)
+			for (int j = 0; j < map[i].length; ++j)
+				map[i][j].setVisible(visible);
 	}
 
 	private void makeSession() {
@@ -307,7 +336,7 @@ public class GameClient extends JFrame implements Client {
 			"Enter IP address where session will be hosted:",
 			"localhost"
 		);
-		if ((connection = network.makeSession(this, ip)) != null)
+		if (ip != null && (connection = network.makeSession(this, ip)) != null)
 			showSession();
 	}
 
@@ -317,7 +346,7 @@ public class GameClient extends JFrame implements Client {
 			"Enter IP address of session to be joined:",
 			"127.0.0.1"
 		);
-		if ((connection = network.joinSession(this, ip)) != null)
+		if (ip != null && (connection = network.joinSession(this, ip)) != null)
 			showSession();
 	}
 
@@ -338,7 +367,6 @@ public class GameClient extends JFrame implements Client {
 
 	private void quitMatch() {
 		connection.quitMatch();
-		showSession();
 	}
 
 	private void play() {

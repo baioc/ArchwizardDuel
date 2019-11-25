@@ -1,18 +1,13 @@
-.PHONY: run clean kill
-
-export BUILDER = mvn
+.PHONY: test clean kill
 
 export LIBDIR  = $(CURDIR)/lib
 export TARGDIR = $(CURDIR)/target
 
-run:
-	$(MAKE) kill ; $(MAKE) clean
-	$(BUILDER) package
-	cd $(LIBDIR) && $(MAKE) run
+build:
+	mvn compile
 
-kill:
-	@killall java
+test:
+	mvn package && cd $(LIBDIR) && $(MAKE) run
 
 clean:
-	$(MAKE) kill ; $(BUILDER) clean
-	@rm -f netgames.log
+	clear && mvn clean && killall java
