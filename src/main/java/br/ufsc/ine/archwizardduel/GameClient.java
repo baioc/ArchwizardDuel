@@ -39,6 +39,7 @@ public class GameClient extends JFrame implements Client {
 	private ImageIcon wizardLeft;
 	private ImageIcon wizardDown;
 	private ImageIcon wizardRight;
+	private JLabel status;
 
 
 	/*************************** PUBLIC INTERFACE *****************************/
@@ -176,6 +177,10 @@ public class GameClient extends JFrame implements Client {
 			}
 		}
 
+		status = new JLabel("");
+		status.setBounds(320, 240, 300, 50);
+		this.add(status);
+
 		showBegin();
 	}
 
@@ -235,13 +240,15 @@ public class GameClient extends JFrame implements Client {
 	}
 
 	@Override
-	public void redraw(GameObject[][] world) { // @TODO: show players status
+	public void redraw(GameObject[][] world) {
 		for (int i = 0; i < map.length; ++i) {
 			for (int j = 0; j < map[i].length; ++j) {
 				ImageIcon updated = null;
+
 				switch (world[i][j].type()) {
 					case WIZARD:
-						switch (((Wizard) world[i][j].object()).rotation()) {
+						Wizard mage = (Wizard) world[i][j].object();
+						switch (mage.rotation()) {
 							case UP:
 								updated = wizardUp;
 								break;
@@ -255,17 +262,27 @@ public class GameClient extends JFrame implements Client {
 								updated = wizardRight;
 								break;
 						}
+						if (mage.name().equals(player.getName())) {
+							status.setText(
+								"Health: " + mage.health() +
+								"    Mana: " + mage.mana()
+							);
+						}
 						break;
+
 					case FIREBALL:
 						updated = fireball;
 						break;
+
 					case ROCK:
 						updated = rock;
 						break;
+
 					case EMPTY:
 						updated = ground;
 						break;
 				}
+
 				map[i][j].setIcon(updated);
 			}
 		}
@@ -276,6 +293,7 @@ public class GameClient extends JFrame implements Client {
 	/**************************** PRIVATE METHODS *****************************/
 
 	private void setMapVisible(boolean visible) {
+		status.setVisible(visible);
 		for (int i = 0; i < map.length; ++i)
 			for (int j = 0; j < map[i].length; ++j)
 				map[i][j].setVisible(visible);
@@ -318,7 +336,6 @@ public class GameClient extends JFrame implements Client {
 
 	private void quitMatch() {
 		connection.quitMatch();
-		showSession();
 	}
 
 	private void play() {

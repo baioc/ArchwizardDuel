@@ -1,21 +1,23 @@
 package br.ufsc.ine.archwizardduel;
 
 import java.util.List;
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.math.BigDecimal;
 
 /**
  * Where wizard dueling takes place.
  */
 class Arena {
 
+	private static final Value nil = new Value(Value.Type.VOID, null);
 	private Interpreter evaluator;
 	private GameObject[][] map;
 	private List<Wizard> characters;
 	private List<Player> players;
 	private int current;
 	private Client gui;
-	private static final Value nil = new Value(Value.Type.VOID, null);
+	private List<Spell> spells;
 
 	/**
 	 * Builds an arena, effectively starting a match with the given parameters.
@@ -29,6 +31,7 @@ class Arena {
 		this.gui = gui;
 		current = first;
 		players = participants;
+		spells = new LinkedList<>();
 
 		// @XXX: fixed number of players
 		characters = new ArrayList<>(2);
@@ -56,7 +59,7 @@ class Arena {
 				return nil;
 			}
 		));
-		primitives.define("move",
+		primitives.define("step",
 			new Value(args -> {
 				Wizard mage = characters.get(current);
 				final int oldX = mage.position()[0];
@@ -88,7 +91,30 @@ class Arena {
 				return nil;
 			}
 		));
-		evaluator = new Interpreter(primitives); // @TODO: extra primitives
+		primitives.define("fireball",
+			new Value(args -> {
+				Wizard mage = characters.get(current);
+				Spell fireball = new Spell(
+					mage,
+					mage.position()[0],
+					mage.position()[1],
+					mage.rotation()
+				);
+				update();
+				fireball.move();
+				final int x = fireball.position()[0];
+				final int y = fireball.position()[1];
+				if (y >= 0 && y < map.length &&
+				    x >= 0 && x < map[y].length &&
+				    map[y][x].type() == GameObject.Type.EMPTY
+				) {
+					map[y][x].set(GameObject.Type.FIREBALL, fireball);
+					spells.add(fireball);
+				}
+				return nil;
+			}
+		));
+		evaluator = new Interpreter(primitives); // @TODO: mana usage
 
 		map = new GameObject[3][15];
 		for (int i = 0; i < map.length; ++i) {
@@ -141,23 +167,71 @@ class Arena {
 
 	/**
 	 * Moves on to the next player's turn. The player's next play is executed
-	 * and the resulting game state is then graphically displayed. If the game
-	 * ends, @TODO: then what?.
+	 * and the resulting game state is then graphically displayed.
+	 *
+	 * @return false when the game has ended, true otherwise
 	 */
-	public void nextTurn() {
+	public boolean nextTurn() {
 		Player currentPlayer = players.get(current);
+		characters.get(current).restore();
 		Expression play = currentPlayer.getNextPlay();
+
 		try {
 			evaluator.interpret(play);
 		} catch (Exception e) {
 			if (isLocalTurn())
 				gui.notify(e.getMessage());
 		}
+
 		current = (current + 1) % players.size();
+
+		for (int p = 0; p < players.size(); ++p) {
+			if (characters.get(p).isDead()) {
+				if (p == 0)
+					gui.notify("Defeat!");
+				else
+					gui.notify("Victory!");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
+
 	private void update() {
+		spells.removeIf(s -> {
+			final int oldX = s.position()[0];
+			final int oldY = s.position()[1];
+			s.move();
+			final int x = s.position()[0];
+			final int y = s.position()[1];
+
+			if (y < 0 || y >= map.length || x < 0 || x >= map[y].length) {
+				map[oldY][oldX].set(GameObject.Type.EMPTY, null);
+				return true;
+			}
+
+			GameObject.Type type = map[y][x].type();
+			Object object = map[y][x].object();
+			if (type == GameObject.Type.EMPTY) {
+				map[oldY][oldX].set(type, object);
+				map[y][x].set(GameObject.Type.FIREBALL, s);
+				return false;
+
+			} else {
+				if (type == GameObject.Type.WIZARD &&
+					!((Wizard) object).name().equals(s.caster().name())
+				) {
+					((Wizard) object).damage(20);
+				}
+				map[oldY][oldX].set(GameObject.Type.EMPTY, null);
+				return true;
+			}
+		});
+
 		gui.redraw(map);
+
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {

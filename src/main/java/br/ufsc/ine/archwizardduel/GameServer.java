@@ -101,6 +101,7 @@ public class GameServer implements Server, OuvidorProxy {
 		} catch (NaoConectadoException | NaoJogandoException e) {
 			e.printStackTrace();
 		}
+		user.showSession();
 	}
 
 	/**

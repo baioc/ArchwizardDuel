@@ -59,7 +59,8 @@ class GameSession implements Session {
 	public void pull(SerializedExpression code) {
 		final Expression play = match.makePlay(code.toString());
 		remotePlayer.setNextPlay(play);
-		match.nextTurn();
+		if (!match.nextTurn())
+			quitMatch();
 	}
 
 
@@ -88,8 +89,10 @@ class GameSession implements Session {
 			final Expression play = match.makePlay(code);
 			if (play != null) {
 				localPlayer.setNextPlay(play);
-				match.nextTurn();
+				boolean gameOver = !match.nextTurn();
 				server.send(new SerializedExpression(play));
+				if (gameOver)
+					quitMatch();
 			}
 		}
 	}
