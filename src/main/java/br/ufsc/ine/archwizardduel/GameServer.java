@@ -45,11 +45,12 @@ public class GameServer implements Server, OuvidorProxy {
 		try {
 			proxy.conectar(ip, user.getPlayer().getName());
 
-			if (localHost && proxy.obterNomeAdversarios().size() > 0) {
+			List<String> online = proxy.obterNomeAdversarios();
+			if (localHost && online.size() > 0) {
 				user.notify("Failed to host session: someone is already there.");
 				leaveSession();
 				return null;
-			} else if (!localHost && proxy.obterNomeAdversarios().size() < 1) {
+			} else if (!localHost && online.size() < 1) {
 				user.notify("Failed to join session: there is nobody there.");
 				leaveSession();
 				return null;
@@ -140,8 +141,8 @@ public class GameServer implements Server, OuvidorProxy {
 
 	@Override
 	public void iniciarNovaPartida(Integer posicao) {
-		if (connection.makeMatch(user))
-			user.showMatch();
+		connection.makeMatch(user);
+		user.showMatch();
 	}
 
 	@Override
