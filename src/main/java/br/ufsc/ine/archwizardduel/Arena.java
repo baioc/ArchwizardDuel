@@ -150,7 +150,7 @@ class Arena {
 
 		current = (current + 1) % players.size();
 
-		for (int p = 0; p < players.size(); ++p) {
+		for (int p = 0; p < characters.size(); ++p) {
 			if (characters.get(p).isDead()) {
 				if (p == 0)
 					gui.notify("Defeat!");

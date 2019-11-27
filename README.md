@@ -28,6 +28,11 @@ Referências na literatura:
 - [Bytecode Pattern - Nystrom, Game Programming Patterns](http://gameprogrammingpatterns.com/bytecode.html)
 
 
+## Como jogar
+
+As [instruções](doc/INSTRUCOES.md) disponibilizadas incluem um tutorial e a listagem das construções sintáticas e operações primitivas disponíveis na linguagem de Archwizard Duel.
+
+
 ## Desenvolvimento
 
 ### [Tarefas](https://github.com/baioc/ArchwizardDuel/projects)

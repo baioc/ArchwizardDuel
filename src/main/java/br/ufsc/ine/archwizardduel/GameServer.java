@@ -128,10 +128,10 @@ public class GameServer implements Server, OuvidorProxy {
 		if (remotes.size() < 1)
 			return null;
 
-		ArrayList<Player> participants = new ArrayList<>(remotes.size() + 1);
+		// @XXX: fixed number of players
+		ArrayList<Player> participants = new ArrayList<>(2);
 		participants.add(user.getPlayer());
-		for (String name : remotes)
-			participants.add(new Player(name));
+		participants.add(new Player(remotes.get(0)));
 
 		return participants;
 	}

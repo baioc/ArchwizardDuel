@@ -1,6 +1,13 @@
 # Como jogar Archwizard Duel
 
 <!-- pandoc -f markdown -t latex INSTRUCOES.md -o INSTRUCOES.pdf -->
+<!-- pdfunite Analise.pdf INSTRUCOES.pdf Requisitos.pdf -->
+
+
+## Configurando o servidor NetGames
+
+Para que seja possível jogar o jogo, deve haver uma instância do servidor NetGames executando em um certo endereço de IP (podendo ser inclusive na máquina local, caso em que o IP a ser usado é *localhost* ou 127.0.0.1).
+Esse endereço deve ser informado por ambos os jogadores ao se conectarem na sessão.
 
 
 ## Conectando-se em uma sessão
@@ -21,8 +28,6 @@
 
 Nesse ponto, o mapa do jogo é mostrado a ambos os jogadores, assim como os pontos de vida e magia do personagem associado ao usuário.
 
-![prototipo](gui.png)
-
 Existem na arena três tipos de elementos:
 
 - **Rochas**, que são permanentemente fixas no mapa e podem ser usadas como barreiras contra feitiços.
@@ -33,9 +38,10 @@ Existem na arena três tipos de elementos:
 O ganhador de um duelo é aquele que conseguir fazer com que o mago adversário perca todos os seus pontos de vida.
 
 Cada jogada é realizada seguindo os comandos programados pelo jogador e enviados em seu turno.
-**Um turno termina quando todos os comandos forem executados ou quando houver algum problema na execução do código** (se o mago ficar sem mana, por exemplo).
+**Um turno termina quando todos os comandos forem executados ou quando houver algum problema na execução do código** (inclui tentar executar uma ação sem ter mana suficiente, acessar uma variável indefinida, somar elementos que não são números, entre outros).
 
-A linguagem se aproxima de LISP e conta com alguns mecanismos para controle de fluxo de execução, operações aritméticas, definições de variáveis, criação de procedimento e utilização de funções de primeira ordem. São eles:
+A linguagem se aproxima de LISP e conta com alguns mecanismos para controle de fluxo de execução, operações aritméticas, definições de variáveis, criação de procedimento e utilização de funções de primeira ordem.
+Segue abaixo um exemplo didático:
 
 ```scheme
 ; todo texto que vem depois de um ';'
@@ -76,10 +82,10 @@ Seguem listados a seguir os procedimentos e valores primitivos disponíveis na l
 - `RIGHT`: valor utilizado para representar a direção de movimentação à direita.
 - `(turn! dir)`: vira o mago para a direção desejada, devendo ser alguma dentre `UP`, `DOWN`, `LEFT` ou `RIGHT`. Custa 5 de mana.
 - `(step!)`: faz com que o mago dê um passo à frente, consumindo 10 de mana.
-- `(fireball!)`: lança uma magia de bola de fogo na direção à qual o mago está virado. O feitiço é dissipado após atingir algum obstáculo e causa 20 pontos de dano ao oponente. Custa 30 pontos de mana.
+- `(fireball!)`: lança uma magia de bola de fogo na direção à qual o mago está virado. O feitiço é dissipado após atingir algum obstáculo e causa 20 pontos de dano ao oponente se tocá-lo. Custa 30 pontos de mana.
 - `(blocked?)`: confere se o mago pode dar um passo à frente, ou se o caminho está bloqueado.
 - `(mana)`: retorna a mana disponível nesse instante.
-- `(health)`: : retorna a vida disponível nesse instante.
+- `(health)`: retorna a vida disponível nesse instante.
 
 - `false`: valor booleano falso.
 - `true`: valor booleano verdadeiro.
