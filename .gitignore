@@ -1,6 +1,4 @@
-#
-# Standard Maven .gitignore
-#
+# Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -11,17 +9,16 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
-#
-# IntelliJ
-#
-*.iml
-.idea/*
-!.idea/runConfigurations/
+# Visual Paradigm
+*.vpp.bak*
 
-#
 # Visual Studio Code
-#
 .settings/
 .classpath
 .project
 .vscode/
+
+# IntelliJ
+*.iml
+.idea/*
+!.idea/runConfigurations/
